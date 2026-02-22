@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
 import { playPop, playBigWin } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
+import ChallengeUploadModal from "@/components/ChallengeUploadModal";
 
 const progressMessages = [
   "", // 0
@@ -19,6 +20,7 @@ const progressMessages = [
 
 export default function Challenges() {
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
+  const [uploadChallenge, setUploadChallenge] = useState<Challenge | null>(null);
   const completed = getCompletedCount(challenges);
   const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
@@ -26,16 +28,19 @@ export default function Challenges() {
 
   const toggleChallenge = (id: string) => {
     setChallenges((prev) => {
-      const next = prev.map((c) =>
-        c.id === id ? { ...c, completed: !c.completed } : c
-      );
-      const newCount = getCompletedCount(next);
-      const wasCompleting = newCount > completed;
+      const challenge = prev.find((c) => c.id === id);
+      if (!challenge) return prev;
 
-      if (wasCompleting && newCount <= 5) {
+      // If not completed yet, complete it and open upload modal
+      if (!challenge.completed) {
+        const next = prev.map((c) =>
+          c.id === id ? { ...c, completed: true } : c
+        );
+        const newCount = getCompletedCount(next);
+
         // Haptic
         if (navigator.vibrate) navigator.vibrate(50);
-        // Confetti
+        // Confetti + sound
         if (newCount === 5) {
           fireBigConfetti();
           playBigWin();
@@ -46,14 +51,32 @@ export default function Challenges() {
         // Toast
         const msg = progressMessages[newCount];
         if (msg) {
-          toast({
-            title: `${newCount}/5 ${msg}`,
-          });
+          toast({ title: `${newCount}/5 ${msg}` });
         }
+
+        // Open upload modal
+        setUploadChallenge({ ...challenge, completed: true });
+
+        return next;
       }
 
-      return next;
+      // If already completed, uncomplete
+      return prev.map((c) =>
+        c.id === id ? { ...c, completed: false } : c
+      );
     });
+  };
+
+  const handleUploadPost = (data: { caption: string }) => {
+    if (uploadChallenge) {
+      setChallenges((prev) =>
+        prev.map((c) =>
+          c.id === uploadChallenge.id ? { ...c, hasVideo: true } : c
+        )
+      );
+      toast({ title: "Posted to feed!" });
+    }
+    setUploadChallenge(null);
   };
 
   return (
@@ -108,8 +131,8 @@ export default function Challenges() {
           <Progress value={(Math.min(completed, 5) / 5) * 100} className="h-2 bg-muted" />
         </div>
 
-        {/* Challenge List */}
-        <div className="space-y-2">
+        {/* Challenge List — unified pill container */}
+        <div className="overflow-hidden rounded-xl border bg-card">
           <AnimatePresence>
             {challenges.map((challenge, i) => (
               <motion.div
@@ -118,62 +141,60 @@ export default function Challenges() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.03 }}
                 className={cn(
-                  "group overflow-hidden rounded-xl border bg-card p-3.5 transition-all",
-                  challenge.completed
-                    ? "border-success/30 bg-success/5"
-                    : "hover:border-primary/20"
+                  "group flex items-center gap-3 px-4 py-3 transition-all",
+                  i !== challenges.length - 1 && "border-b",
+                  challenge.completed && "bg-success/5"
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 text-xl">{challenge.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      className={cn(
-                        "text-sm font-semibold text-foreground",
-                        challenge.completed && "line-through opacity-50"
-                      )}
-                    >
-                      {challenge.title}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                      {challenge.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {challenge.completed && !challenge.hasVideo && (
-                      <button className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary">
-                        <Upload className="h-3 w-3" />
-                      </button>
-                    )}
-                    {challenge.hasVideo && (
-                      <span className="text-xs text-muted-foreground">📹</span>
-                    )}
+                {/* Number */}
+                <span className={cn(
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                  challenge.completed
+                    ? "bg-success text-success-foreground"
+                    : "bg-muted text-muted-foreground"
+                )}>
+                  {challenge.completed ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
+                </span>
+
+                {/* Title only */}
+                <button
+                  onClick={() => toggleChallenge(challenge.id)}
+                  className="flex-1 text-left"
+                >
+                  <span className={cn(
+                    "text-sm font-medium text-foreground",
+                    challenge.completed && "line-through opacity-50"
+                  )}>
+                    {challenge.title}
+                  </span>
+                </button>
+
+                {/* Upload indicator */}
+                <div className="flex items-center gap-2">
+                  {challenge.completed && !challenge.hasVideo && (
                     <button
-                      onClick={() => toggleChallenge(challenge.id)}
-                      className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all",
-                        challenge.completed
-                          ? "border-success bg-success text-success-foreground"
-                          : "border-muted-foreground/30 hover:border-primary"
-                      )}
+                      onClick={() => setUploadChallenge(challenge)}
+                      className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                     >
-                      {challenge.completed && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 500 }}
-                        >
-                          <Check className="h-4 w-4" strokeWidth={3} />
-                        </motion.div>
-                      )}
+                      <Upload className="h-3 w-3" />
                     </button>
-                  </div>
+                  )}
+                  {challenge.hasVideo && (
+                    <span className="text-xs text-muted-foreground">📹</span>
+                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Upload Modal */}
+      <ChallengeUploadModal
+        challenge={uploadChallenge}
+        onClose={() => setUploadChallenge(null)}
+        onPost={handleUploadPost}
+      />
     </div>
   );
 }
