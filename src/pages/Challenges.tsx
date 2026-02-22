@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock, Trophy, Upload, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -7,7 +8,6 @@ import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
 import { playPop, playBigWin } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
-import ChallengeUploadModal from "@/components/ChallengeUploadModal";
 
 const progressMessages = [
   "", // 0
@@ -19,8 +19,8 @@ const progressMessages = [
 ];
 
 export default function Challenges() {
+  const navigate = useNavigate();
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
-  const [uploadChallenge, setUploadChallenge] = useState<Challenge | null>(null);
   const completed = getCompletedCount(challenges);
   const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
@@ -54,8 +54,8 @@ export default function Challenges() {
           toast({ title: `${newCount}/5 ${msg}` });
         }
 
-        // Open upload modal
-        setUploadChallenge({ ...challenge, completed: true });
+        // Navigate to post page
+        setTimeout(() => navigate("/post", { state: { challengeTitle: challenge.title } }), 300);
 
         return next;
       }
@@ -67,17 +67,6 @@ export default function Challenges() {
     });
   };
 
-  const handleUploadPost = (data: { caption: string }) => {
-    if (uploadChallenge) {
-      setChallenges((prev) =>
-        prev.map((c) =>
-          c.id === uploadChallenge.id ? { ...c, hasVideo: true } : c
-        )
-      );
-      toast({ title: "Posted to feed!" });
-    }
-    setUploadChallenge(null);
-  };
 
   return (
     <div className="min-h-screen pb-24 pt-4">
@@ -193,7 +182,7 @@ export default function Challenges() {
                 <div className="flex items-center gap-2">
                   {challenge.completed && !challenge.hasVideo && (
                     <button
-                      onClick={() => setUploadChallenge(challenge)}
+                      onClick={() => navigate("/post", { state: { challengeTitle: challenge.title } })}
                       className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                     >
                       <Upload className="h-3 w-3" />
@@ -209,12 +198,6 @@ export default function Challenges() {
         </div>
       </div>
 
-      {/* Upload Modal */}
-      <ChallengeUploadModal
-        challenge={uploadChallenge}
-        onClose={() => setUploadChallenge(null)}
-        onPost={handleUploadPost}
-      />
     </div>
   );
 }
