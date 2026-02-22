@@ -1,39 +1,20 @@
-import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockFeedPosts, getWeeklyScore, type FeedPost } from "@/lib/mock-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AvatarDisplay from "@/components/AvatarDisplay";
+import ReelViewer from "@/components/ReelViewer";
 
-function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
-  const [liked, setLiked] = useState(post.liked);
-  const [likeCount, setLikeCount] = useState(post.likes);
-  const [showHeartAnim, setShowHeartAnim] = useState(false);
-  const lastTapRef = useRef(0);
-
-  const toggleLike = () => {
-    setLiked(!liked);
-    setLikeCount((c) => (liked ? c - 1 : c + 1));
-  };
-
-  const doLike = useCallback(() => {
-    if (!liked) {
-      setLiked(true);
-      setLikeCount((c) => c + 1);
-    }
-    setShowHeartAnim(true);
-    setTimeout(() => setShowHeartAnim(false), 600);
-  }, [liked]);
-
-  const handleDoubleTap = useCallback(() => {
-    const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      doLike();
-    }
-    lastTapRef.current = now;
-  }, [doLike]);
-
+function GridThumbnail({
+  post,
+  rank,
+  onClick,
+}: {
+  post: FeedPost;
+  rank?: number;
+  onClick: () => void;
+}) {
   const rankColors: Record<number, string> = {
     1: "bg-prize text-prize-foreground",
     2: "bg-silver text-foreground",
@@ -41,90 +22,60 @@ function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-xl border bg-card"
-      onClick={handleDoubleTap}
+    <div
+      className="relative aspect-[9/16] cursor-pointer overflow-hidden"
+      onClick={onClick}
     >
-      {/* Thumbnail */}
-      <div className="relative aspect-[9/16] bg-muted">
-        <img
-          src={post.thumbnailUrl}
-          alt={post.challengeTitle}
-          className="h-full w-full object-cover select-none"
-          draggable={false}
-        />
-        {rank && (
-          <div className={cn(
-            "absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
+      <img
+        src={post.thumbnailUrl}
+        alt={post.challengeTitle}
+        className="h-full w-full object-cover select-none"
+        draggable={false}
+      />
+
+      {/* Rank badge */}
+      {rank && (
+        <div
+          className={cn(
+            "absolute top-1.5 left-1.5 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
             rankColors[rank] || "bg-muted text-foreground"
-          )}>
-            {rank}
-          </div>
-        )}
-        {/* Double-tap heart animation */}
-        <AnimatePresence>
-          {showHeartAnim && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.4, opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            >
-              <Heart className="h-16 w-16 fill-white text-white drop-shadow-lg" />
-            </motion.div>
           )}
-        </AnimatePresence>
+        >
+          {rank}
+        </div>
+      )}
+
+      {/* Bottom gradient overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+
+      {/* Like count */}
+      <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1">
+        <Heart className="h-3 w-3 fill-white text-white" />
+        <span className="text-[10px] font-semibold text-white">{post.likes}</span>
       </div>
 
-      {/* Post info */}
-      <div className="p-3">
-        <div className="mb-2 flex items-center gap-2">
-          <AvatarDisplay
-            avatar={post.avatar}
-            stage={post.avatarStage}
-            size="sm"
-            showAddFriend={!post.isFriend}
-            onAddFriend={() => {}}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-foreground">{post.username}</p>
-            <p className="truncate text-xs text-muted-foreground">{post.challengeTitle}</p>
-          </div>
-          <span className="text-xs text-muted-foreground">{post.createdAt}</span>
-        </div>
-
-        <div className="flex justify-end">
-          <button onClick={(e) => { e.stopPropagation(); toggleLike(); }} className="flex items-center gap-1.5 transition-transform active:scale-90">
-            <Heart
-              className={cn(
-                "h-5 w-5 transition-colors",
-                liked ? "fill-destructive text-destructive" : "text-muted-foreground"
-              )}
-            />
-            <span className="text-sm font-semibold text-foreground">{likeCount}</span>
-          </button>
-        </div>
-      </div>
-    </motion.div>
+      {/* Username */}
+      <p className="absolute bottom-1.5 right-1.5 truncate max-w-[60%] text-[10px] text-white/90 font-medium text-right">
+        {post.username}
+      </p>
+    </div>
   );
 }
 
 export default function Feed() {
-  // Sort: This Week = time-decay score, All Time = pure likes, Friends = chronological
+  const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
+
   const weekPosts = [...mockFeedPosts].sort((a, b) => getWeeklyScore(b) - getWeeklyScore(a));
   const allTimePosts = [...mockFeedPosts].sort((a, b) => b.likes - a.likes);
   const friendPosts = mockFeedPosts.filter((p) => p.isFriend).sort((a, b) => a.daysAgo - b.daysAgo);
 
   return (
     <div className="min-h-screen pb-24 pt-4">
-      <div className="mx-auto max-w-lg px-4">
-        <h1 className="mb-4 text-2xl font-bold text-foreground">Feed</h1>
+      <div className="mx-auto max-w-lg px-1">
+        <h1 className="mb-4 px-3 text-2xl font-bold text-foreground">Feed</h1>
 
         <Tabs defaultValue="week" className="w-full">
-          <TabsList className="mb-4 w-full rounded-lg bg-muted p-1">
+          <TabsList className="mx-3 mb-3 w-[calc(100%-1.5rem)] rounded-lg bg-muted p-1">
             <TabsTrigger value="week" className="flex-1 rounded-md text-sm font-medium">
               This Week
             </TabsTrigger>
@@ -136,23 +87,29 @@ export default function Feed() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="week" className="space-y-3">
-            {weekPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
+          <TabsContent value="week">
+            <div className="grid grid-cols-3 gap-0.5">
+              {weekPosts.map((post) => (
+                <GridThumbnail key={post.id} post={post} onClick={() => setSelectedPost(post)} />
+              ))}
+            </div>
           </TabsContent>
 
-          <TabsContent value="alltime" className="space-y-3">
-            {allTimePosts.map((post, i) => (
-              <PostCard key={post.id} post={post} rank={i + 1} />
-            ))}
+          <TabsContent value="alltime">
+            <div className="grid grid-cols-3 gap-0.5">
+              {allTimePosts.map((post, i) => (
+                <GridThumbnail key={post.id} post={post} rank={i + 1} onClick={() => setSelectedPost(post)} />
+              ))}
+            </div>
           </TabsContent>
 
-          <TabsContent value="friends" className="space-y-3">
+          <TabsContent value="friends">
             {friendPosts.length > 0 ? (
-              friendPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))
+              <div className="grid grid-cols-3 gap-0.5">
+                {friendPosts.map((post) => (
+                  <GridThumbnail key={post.id} post={post} onClick={() => setSelectedPost(post)} />
+                ))}
+              </div>
             ) : (
               <p className="py-12 text-center text-sm text-muted-foreground">
                 Add friends to see their videos here
@@ -161,6 +118,13 @@ export default function Feed() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Full-screen reel viewer */}
+      <AnimatePresence>
+        {selectedPost && (
+          <ReelViewer post={selectedPost} onClose={() => setSelectedPost(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
