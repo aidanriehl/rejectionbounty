@@ -9,6 +9,7 @@ import Feed from "@/pages/Feed";
 import Profile from "@/pages/Profile";
 import SettingsPage from "@/pages/Settings";
 import PostPage from "@/pages/Post";
+import FriendsPage from "@/pages/Friends";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/post" element={<PostPage />} />
+            <Route path="/friends" element={<FriendsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
