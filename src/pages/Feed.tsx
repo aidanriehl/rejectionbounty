@@ -1,10 +1,15 @@
 import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockFeedPosts, getWeeklyScore, type FeedPost } from "@/lib/mock-data";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AvatarDisplay from "@/components/AvatarDisplay";
+
+const TABS = [
+  { key: "week", label: "This Week" },
+  { key: "friends", label: "Friends" },
+  { key: "alltime", label: "All Time" },
+] as const;
 
 function ReelCard({ post }: { post: FeedPost }) {
   const [liked, setLiked] = useState(post.liked);
@@ -39,7 +44,6 @@ function ReelCard({ post }: { post: FeedPost }) {
       className="relative h-[calc(100vh-5rem)] w-full snap-start snap-always flex-shrink-0"
       onClick={handleDoubleTap}
     >
-      {/* Full-bleed image */}
       <img
         src={post.thumbnailUrl}
         alt={post.challengeTitle}
@@ -47,7 +51,6 @@ function ReelCard({ post }: { post: FeedPost }) {
         draggable={false}
       />
 
-      {/* Double-tap heart animation */}
       <AnimatePresence>
         {showHeartAnim && (
           <motion.div
@@ -62,7 +65,6 @@ function ReelCard({ post }: { post: FeedPost }) {
         )}
       </AnimatePresence>
 
-      {/* Right action bar */}
       <div className="absolute right-3 bottom-28 flex flex-col items-center gap-5">
         <button
           onClick={(e) => { e.stopPropagation(); toggleLike(); }}
@@ -78,7 +80,8 @@ function ReelCard({ post }: { post: FeedPost }) {
         </button>
       </div>
 
-      {/* Bottom info */}
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+
       <div className="absolute bottom-4 left-4 right-16">
         <div className="flex items-center gap-2.5 mb-1.5">
           <AvatarDisplay
@@ -92,67 +95,103 @@ function ReelCard({ post }: { post: FeedPost }) {
         </div>
         <p className="text-xs text-white/80 drop-shadow-md">{post.challengeTitle}</p>
       </div>
+    </div>
+  );
+}
 
-      {/* Bottom gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+function FeedPane({ posts }: { posts: FeedPost[] }) {
+  if (posts.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-white/60">Add friends to see their videos here</p>
+      </div>
+    );
+  }
+  return (
+    <div className="h-full w-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
+      {posts.map((post) => (
+        <ReelCard key={post.id} post={post} />
+      ))}
     </div>
   );
 }
 
 export default function Feed() {
-  const [activeTab, setActiveTab] = useState("week");
+  const [tabIndex, setTabIndex] = useState(0);
+  const dragX = useMotionValue(0);
 
   const weekPosts = [...mockFeedPosts].sort((a, b) => getWeeklyScore(b) - getWeeklyScore(a));
   const allTimePosts = [...mockFeedPosts].sort((a, b) => b.likes - a.likes);
   const friendPosts = mockFeedPosts.filter((p) => p.isFriend).sort((a, b) => a.daysAgo - b.daysAgo);
 
-  const currentPosts =
-    activeTab === "week" ? weekPosts :
-    activeTab === "alltime" ? allTimePosts :
-    friendPosts;
+  const panes = [weekPosts, friendPosts, allTimePosts];
+
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold && tabIndex < TABS.length - 1) {
+      setTabIndex(tabIndex + 1);
+    } else if (info.offset.x > threshold && tabIndex > 0) {
+      setTabIndex(tabIndex - 1);
+    }
+  };
+
+  // Indicator position: fraction across the tab bar
+  const indicatorX = useTransform(
+    dragX,
+    [200, 0, -200],
+    [
+      `${Math.max(0, tabIndex - 1) * (100 / TABS.length)}%`,
+      `${tabIndex * (100 / TABS.length)}%`,
+      `${Math.min(TABS.length - 1, tabIndex + 1) * (100 / TABS.length)}%`,
+    ]
+  );
 
   return (
     <div className="relative h-[calc(100vh-5rem)] w-full overflow-hidden bg-black">
-      {/* Tabs overlay at top */}
+      {/* Tab bar overlay */}
       <div className="absolute top-0 inset-x-0 z-10 pt-3 px-4">
-        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-1">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full bg-transparent">
-              <TabsTrigger
-                value="week"
-                className="flex-1 rounded-md text-sm font-medium text-white/60 data-[state=active]:bg-white/20 data-[state=active]:text-white"
+        <div className="relative bg-black/30 backdrop-blur-sm rounded-lg p-1">
+          {/* Active indicator */}
+          <motion.div
+            className="absolute top-1 bottom-1 rounded-md bg-white/20"
+            style={{ width: `${100 / TABS.length}%` }}
+            animate={{ left: `${tabIndex * (100 / TABS.length)}%` }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+          <div className="relative flex">
+            {TABS.map((tab, i) => (
+              <button
+                key={tab.key}
+                onClick={() => setTabIndex(i)}
+                className={cn(
+                  "flex-1 py-1.5 text-sm font-medium rounded-md transition-colors z-10",
+                  i === tabIndex ? "text-white" : "text-white/50"
+                )}
               >
-                This Week
-              </TabsTrigger>
-              <TabsTrigger
-                value="alltime"
-                className="flex-1 rounded-md text-sm font-medium text-white/60 data-[state=active]:bg-white/20 data-[state=active]:text-white"
-              >
-                All Time
-              </TabsTrigger>
-              <TabsTrigger
-                value="friends"
-                className="flex-1 rounded-md text-sm font-medium text-white/60 data-[state=active]:bg-white/20 data-[state=active]:text-white"
-              >
-                Friends
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Vertical snap-scroll feed */}
-      <div className="h-full w-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
-        {currentPosts.length > 0 ? (
-          currentPosts.map((post) => (
-            <ReelCard key={post.id} post={post} />
-          ))
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-white/60">Add friends to see their videos here</p>
+      {/* Swipeable panes */}
+      <motion.div
+        className="flex h-full"
+        style={{ x: dragX }}
+        animate={{ x: -tabIndex * 100 + "%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.15}
+        onDragEnd={handleDragEnd}
+      >
+        {panes.map((posts, i) => (
+          <div key={TABS[i].key} className="h-full w-full flex-shrink-0">
+            <FeedPane posts={posts} />
           </div>
-        )}
-      </div>
+        ))}
+      </motion.div>
     </div>
   );
 }
