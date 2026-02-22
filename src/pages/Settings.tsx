@@ -63,6 +63,17 @@ export default function SettingsPage() {
           />
         </div>
 
+        {/* Subscription */}
+        <div className="mb-4 flex items-center justify-between rounded-xl border bg-card p-4">
+          <div>
+            <p className="text-sm font-semibold text-foreground">Free Trial</p>
+            <p className="text-xs text-muted-foreground">23 days remaining</p>
+          </div>
+          <button className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
+            Subscribe
+          </button>
+        </div>
+
         {/* Logout */}
         <button className="flex w-full items-center gap-2 rounded-xl border bg-card p-4 text-sm font-medium text-destructive">
           <LogOut className="h-4 w-4" />

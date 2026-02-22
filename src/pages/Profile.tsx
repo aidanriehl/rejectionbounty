@@ -57,18 +57,6 @@ export default function Profile() {
           ))}
         </div>
 
-        {/* Subscription */}
-        <div className="mt-6 rounded-xl border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-foreground">Free Trial</p>
-              <p className="text-xs text-muted-foreground">23 days remaining</p>
-            </div>
-            <button className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
-              Subscribe
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
