@@ -54,8 +54,6 @@ export default function Challenges() {
           toast({ title: `${newCount}/5 ${msg}` });
         }
 
-        // Navigate to post page
-        setTimeout(() => navigate("/post", { state: { challengeTitle: challenge.title } }), 300);
 
         return next;
       }
