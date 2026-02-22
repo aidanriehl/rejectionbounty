@@ -72,7 +72,7 @@ export default function PostPage() {
           <div className="mb-4">
             <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
               <Image className="h-3.5 w-3.5" />
-              Choose thumbnail from video
+              Choose thumbnail
             </p>
             {/* Preview frame */}
             <div className="mb-3 flex h-40 items-center justify-center rounded-xl bg-muted">
