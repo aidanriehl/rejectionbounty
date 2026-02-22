@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Settings, Lock, Globe } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Settings } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import AvatarPicker from "@/components/AvatarPicker";
-import { mockUserProfile, mockUserVideos, avatarLabels, type AvatarType } from "@/lib/mock-data";
-import { Switch } from "@/components/ui/switch";
+import { mockUserProfile, mockUserVideos, avatarLabels } from "@/lib/mock-data";
 
 export default function Profile() {
-  const [profile, setProfile] = useState(mockUserProfile);
-  const [showPicker, setShowPicker] = useState(false);
+  const [profile] = useState(mockUserProfile);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen pb-24 pt-4">
@@ -16,37 +14,23 @@ export default function Profile() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Profile</h1>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <button
+            onClick={() => navigate("/settings")}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground"
+          >
             <Settings className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Avatar + Name (centered, Instagram style) */}
+        {/* Avatar + Name */}
         <div className="mb-6 flex flex-col items-center">
-          <button onClick={() => setShowPicker(!showPicker)}>
-            <AvatarDisplay avatar={profile.avatar} stage={profile.avatarStage} size="lg" />
-          </button>
+          <AvatarDisplay avatar={profile.avatar} stage={profile.avatarStage} size="lg" />
           <p className="mt-1 text-xs text-muted-foreground">{avatarLabels[profile.avatarStage]}</p>
           <h2 className="mt-2 text-lg font-bold text-foreground">{profile.username}</h2>
           <p className="text-xs text-muted-foreground">Member since {profile.memberSince}</p>
         </div>
 
-        {/* Avatar Picker (toggle) */}
-        {showPicker && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="mb-6 overflow-hidden rounded-xl border bg-card p-4"
-          >
-            <p className="mb-3 text-center text-sm font-medium text-foreground">Choose your avatar</p>
-            <AvatarPicker
-              selected={profile.avatar}
-              onSelect={(avatar: AvatarType) => setProfile({ ...profile, avatar })}
-            />
-          </motion.div>
-        )}
-
-        {/* Stats Row (Instagram style) */}
+        {/* Stats Row */}
         <div className="mb-6 flex items-center justify-around rounded-xl border bg-card py-4">
           <div className="text-center">
             <p className="text-xl font-bold text-foreground">{profile.totalCompleted}</p>
@@ -64,25 +48,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Privacy toggle */}
-        <div className="mb-6 flex items-center justify-between rounded-xl border bg-card p-4">
-          <div className="flex items-center gap-2">
-            {profile.isPublic ? (
-              <Globe className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Lock className="h-4 w-4 text-muted-foreground" />
-            )}
-            <span className="text-sm font-medium text-foreground">
-              {profile.isPublic ? "Public profile" : "Private profile"}
-            </span>
-          </div>
-          <Switch
-            checked={profile.isPublic}
-            onCheckedChange={(checked) => setProfile({ ...profile, isPublic: checked })}
-          />
-        </div>
-
-        {/* Video Grid (3x3) */}
+        {/* Video Grid */}
         <div className="grid grid-cols-3 gap-0.5 overflow-hidden rounded-xl">
           {mockUserVideos.map((url, i) => (
             <div key={i} className="aspect-square bg-muted">
