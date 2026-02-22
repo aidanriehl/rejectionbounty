@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
+import { playPop, playBigWin } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
 
 const progressMessages = [
@@ -37,8 +38,10 @@ export default function Challenges() {
         // Confetti
         if (newCount === 5) {
           fireBigConfetti();
+          playBigWin();
         } else {
           fireConfetti();
+          playPop();
         }
         // Toast
         const msg = progressMessages[newCount];
