@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { X, Upload, Image, Film } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -9,13 +9,16 @@ export default function PostPage() {
   const challengeTitle = (location.state as any)?.challengeTitle || "Challenge";
   const [caption, setCaption] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [selectedThumb, setSelectedThumb] = useState(0);
+  const [thumbPosition, setThumbPosition] = useState(0); // 0–100
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Mock thumbnail frames (in real app these would be extracted from the video)
-  const thumbFrames = videoFile
-    ? [0, 1, 2].map((i) => URL.createObjectURL(videoFile))
-    : [];
+  const thumbLabel = useMemo(() => {
+    const totalSec = 30; // assume 30s video
+    const sec = Math.round((thumbPosition / 100) * totalSec);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }, [thumbPosition]);
 
   const handlePost = () => {
     toast({ title: "Posted to feed!" });
@@ -71,22 +74,23 @@ export default function PostPage() {
               <Image className="h-3.5 w-3.5" />
               Choose thumbnail from video
             </p>
-            <div className="flex gap-2">
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedThumb(i)}
-                  className={`relative h-16 w-16 overflow-hidden rounded-lg border-2 transition-all ${
-                    selectedThumb === i
-                      ? "border-primary ring-1 ring-primary"
-                      : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-                    {i === 0 ? "0:00" : i === 1 ? "0:15" : "0:30"}
-                  </div>
-                </button>
-              ))}
+            {/* Preview frame */}
+            <div className="mb-3 flex h-40 items-center justify-center rounded-xl bg-muted">
+              <span className="text-2xl font-bold text-muted-foreground">{thumbLabel}</span>
+            </div>
+            {/* Slider */}
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={thumbPosition}
+              onChange={(e) => setThumbPosition(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+            <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+              <span>0:00</span>
+              <span>{thumbLabel}</span>
+              <span>0:30</span>
             </div>
           </div>
         )}
