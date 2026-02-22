@@ -165,7 +165,7 @@ export default function Challenges() {
                     "text-sm font-medium text-foreground",
                     challenge.completed && "line-through opacity-50"
                   )}>
-                    {challenge.title}
+                    {challenge.title} {challenge.emoji}
                   </span>
                 </button>
 
