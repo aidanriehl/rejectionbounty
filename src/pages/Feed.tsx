@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockFeedPosts, getWeeklyScore, type FeedPost } from "@/lib/mock-data";
@@ -9,12 +9,30 @@ import AvatarDisplay from "@/components/AvatarDisplay";
 function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
   const [liked, setLiked] = useState(post.liked);
   const [likeCount, setLikeCount] = useState(post.likes);
-  const imgRef = useRef<HTMLDivElement>(null);
+  const [showHeartAnim, setShowHeartAnim] = useState(false);
+  const lastTapRef = useRef(0);
 
   const toggleLike = () => {
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
+
+  const doLike = useCallback(() => {
+    if (!liked) {
+      setLiked(true);
+      setLikeCount((c) => c + 1);
+    }
+    setShowHeartAnim(true);
+    setTimeout(() => setShowHeartAnim(false), 600);
+  }, [liked]);
+
+  const handleDoubleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      doLike();
+    }
+    lastTapRef.current = now;
+  }, [doLike]);
 
   const rankColors: Record<number, string> = {
     1: "bg-prize text-prize-foreground",
@@ -27,13 +45,15 @@ function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="overflow-hidden rounded-xl border bg-card"
+      onClick={handleDoubleTap}
     >
       {/* Thumbnail */}
-      <div ref={imgRef} className="relative aspect-[4/3] bg-muted">
+      <div className="relative aspect-[4/3] bg-muted">
         <img
           src={post.thumbnailUrl}
           alt={post.challengeTitle}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover select-none"
+          draggable={false}
         />
         {rank && (
           <div className={cn(
@@ -43,6 +63,20 @@ function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
             {rank}
           </div>
         )}
+        {/* Double-tap heart animation */}
+        <AnimatePresence>
+          {showHeartAnim && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.4, opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <Heart className="h-16 w-16 fill-white text-white drop-shadow-lg" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Post info */}
@@ -62,15 +96,17 @@ function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
           <span className="text-xs text-muted-foreground">{post.createdAt}</span>
         </div>
 
-        <button onClick={toggleLike} className="flex items-center gap-1.5 transition-transform active:scale-90">
-          <Heart
-            className={cn(
-              "h-5 w-5 transition-colors",
-              liked ? "fill-destructive text-destructive" : "text-muted-foreground"
-            )}
-          />
-          <span className="text-sm font-semibold text-foreground">{likeCount}</span>
-        </button>
+        <div className="flex justify-end">
+          <button onClick={(e) => { e.stopPropagation(); toggleLike(); }} className="flex items-center gap-1.5 transition-transform active:scale-90">
+            <Heart
+              className={cn(
+                "h-5 w-5 transition-colors",
+                liked ? "fill-destructive text-destructive" : "text-muted-foreground"
+              )}
+            />
+            <span className="text-sm font-semibold text-foreground">{likeCount}</span>
+          </button>
+        </div>
       </div>
     </motion.div>
   );
