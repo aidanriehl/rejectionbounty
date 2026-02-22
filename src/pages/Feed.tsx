@@ -48,7 +48,7 @@ function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
       onClick={handleDoubleTap}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-[4/3] bg-muted">
+      <div className="relative aspect-[9/16] bg-muted">
         <img
           src={post.thumbnailUrl}
           alt={post.challengeTitle}
