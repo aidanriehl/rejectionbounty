@@ -34,7 +34,7 @@ export default function Profile() {
           <div className="flex flex-1 justify-around">
             <div className="text-center">
               <p className="text-lg font-bold text-foreground">{profile.totalCompleted}</p>
-              <p className="text-[11px] text-muted-foreground">Challenges</p>
+              <p className="text-[11px] text-muted-foreground">Completed</p>
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-foreground">{profile.streak}</p>
