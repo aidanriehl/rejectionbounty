@@ -48,11 +48,6 @@ export default function Challenges() {
           fireConfetti();
           playPop();
         }
-        // Toast
-        const msg = progressMessages[newCount];
-        if (msg) {
-          toast({ title: `${newCount}/5 ${msg}` });
-        }
 
 
         return next;
