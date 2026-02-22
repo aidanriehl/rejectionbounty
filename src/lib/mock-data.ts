@@ -7,18 +7,49 @@ export interface Challenge {
   hasVideo: boolean;
 }
 
+export type AvatarType = "dragon" | "tree" | "fox" | "owl" | "cat";
+export type AvatarStage = 0 | 1 | 2 | 3;
+
+export interface UserProfile {
+  username: string;
+  avatar: AvatarType;
+  avatarStage: AvatarStage;
+  streak: number;
+  totalCompleted: number;
+  friends: number;
+  isPublic: boolean;
+  memberSince: string;
+}
+
 export interface FeedPost {
   id: string;
   username: string;
-  avatarUrl: string;
+  avatar: AvatarType;
+  avatarStage: AvatarStage;
   challengeTitle: string;
   thumbnailUrl: string;
   videoUrl: string;
   likes: number;
-  comments: number;
   liked: boolean;
   createdAt: string;
+  daysAgo: number; // for time-decay scoring
+  isFriend: boolean;
 }
+
+export const avatarEmojis: Record<AvatarType, string[]> = {
+  dragon: ["🪦", "🐉", "🐲", "🐉✨"],
+  tree:   ["🪦", "🌱", "🌳", "🌳🍎"],
+  fox:    ["🪦", "🦊", "🦊", "🦊👑"],
+  owl:    ["🪦", "🦉", "🦉", "🦉✨"],
+  cat:    ["🪦", "🐱", "🐈", "🐈👑"],
+};
+
+export const avatarLabels: Record<AvatarStage, string> = {
+  0: "R.I.P.",
+  1: "Rookie",
+  2: "Rising",
+  3: "Legend",
+};
 
 export const mockChallenges: Challenge[] = [
   { id: "1", title: "Ask a stranger for a high-five", description: "Walk up to someone you don't know and ask for a high-five", emoji: "🖐️", completed: false, hasVideo: false },
@@ -34,11 +65,31 @@ export const mockChallenges: Challenge[] = [
 ];
 
 export const mockFeedPosts: FeedPost[] = [
-  { id: "1", username: "brave_sarah", avatarUrl: "", challengeTitle: "Sing in public for 10 seconds", thumbnailUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop", videoUrl: "", likes: 234, comments: 45, liked: true, createdAt: "2h ago" },
-  { id: "2", username: "rejection_king", avatarUrl: "", challengeTitle: "Ask for a free coffee", thumbnailUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop", videoUrl: "", likes: 189, comments: 32, liked: false, createdAt: "4h ago" },
-  { id: "3", username: "fearless_mike", avatarUrl: "", challengeTitle: "Dance in an elevator", thumbnailUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=400&h=300&fit=crop", videoUrl: "", likes: 156, comments: 28, liked: false, createdAt: "6h ago" },
-  { id: "4", username: "courage_queen", avatarUrl: "", challengeTitle: "Request a discount at a store", thumbnailUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop", videoUrl: "", likes: 134, comments: 19, liked: true, createdAt: "8h ago" },
-  { id: "5", username: "no_fear_nina", avatarUrl: "", challengeTitle: "Ask a stranger for a high-five", thumbnailUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop", videoUrl: "", likes: 98, comments: 15, liked: false, createdAt: "1d ago" },
+  { id: "1", username: "brave_sarah", avatar: "dragon", avatarStage: 3, challengeTitle: "Sing in public for 10 seconds", thumbnailUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop", videoUrl: "", likes: 234, liked: true, createdAt: "2h ago", daysAgo: 0, isFriend: true },
+  { id: "2", username: "rejection_king", avatar: "fox", avatarStage: 2, challengeTitle: "Ask for a free coffee", thumbnailUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop", videoUrl: "", likes: 189, liked: false, createdAt: "4h ago", daysAgo: 0, isFriend: false },
+  { id: "3", username: "fearless_mike", avatar: "owl", avatarStage: 1, challengeTitle: "Dance in an elevator", thumbnailUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=400&h=300&fit=crop", videoUrl: "", likes: 156, liked: false, createdAt: "6h ago", daysAgo: 1, isFriend: true },
+  { id: "4", username: "courage_queen", avatar: "cat", avatarStage: 3, challengeTitle: "Request a discount at a store", thumbnailUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop", videoUrl: "", likes: 134, liked: true, createdAt: "1d ago", daysAgo: 2, isFriend: false },
+  { id: "5", username: "no_fear_nina", avatar: "tree", avatarStage: 0, challengeTitle: "Ask a stranger for a high-five", thumbnailUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop", videoUrl: "", likes: 98, liked: false, createdAt: "3d ago", daysAgo: 3, isFriend: true },
+];
+
+export const mockUserProfile: UserProfile = {
+  username: "DailyRejecter",
+  avatar: "dragon",
+  avatarStage: 2,
+  streak: 4,
+  totalCompleted: 47,
+  friends: 12,
+  isPublic: true,
+  memberSince: "Jan 2026",
+};
+
+export const mockUserVideos = [
+  "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200&h=200&fit=crop",
 ];
 
 export const getCompletedCount = (challenges: Challenge[]) =>
@@ -53,4 +104,10 @@ export const getTimeUntilSunday = () => {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   return { days, hours };
+};
+
+// Time-decay scoring for "This Week" feed
+export const getWeeklyScore = (post: FeedPost) => {
+  const recencyBonus = Math.max(0, 7 - post.daysAgo) * 10;
+  return post.likes + recencyBonus;
 };
