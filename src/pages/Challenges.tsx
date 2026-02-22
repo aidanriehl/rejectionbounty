@@ -175,19 +175,14 @@ export default function Challenges() {
                 </button>
 
                 {/* Upload indicator */}
-                <div className="flex items-center gap-2">
-                  {challenge.completed && !challenge.hasVideo && (
-                    <button
-                      onClick={() => navigate("/post", { state: { challengeTitle: challenge.title } })}
-                      className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
-                    >
-                      <Upload className="h-3 w-3" />
-                    </button>
-                  )}
-                  {challenge.hasVideo && (
-                    <span className="text-xs text-muted-foreground">📹</span>
-                  )}
-                </div>
+                {challenge.completed && (
+                  <button
+                    onClick={() => navigate("/post", { state: { challengeTitle: challenge.title } })}
+                    className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
+                  >
+                    <Upload className="h-3 w-3" />
+                  </button>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
