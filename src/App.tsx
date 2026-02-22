@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import Challenges from "@/pages/Challenges";
 import Feed from "@/pages/Feed";
 import Profile from "@/pages/Profile";
+import SettingsPage from "@/pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Feed />} />
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
