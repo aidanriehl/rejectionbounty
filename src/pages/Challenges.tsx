@@ -84,15 +84,35 @@ export default function Challenges() {
       <div className="mx-auto max-w-lg px-4">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Daily Rejection</h1>
-          <p className="mt-1 text-sm text-muted-foreground">This week's challenges</p>
+          <h1 className="text-2xl font-bold text-foreground">This Week's Challenges</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+          </p>
         </div>
 
-        {/* Subscriber count */}
-        <div className="mb-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Users className="h-4 w-4" />
-          <span>{subscribers.toLocaleString()} subscribers</span>
-        </div>
+        {/* Subscriber Card */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium opacity-60">Subscribers</p>
+                <p className="text-2xl font-bold">{subscribers.toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs opacity-60">Pool increases</p>
+              <p className="text-lg font-bold">+$3.00</p>
+              <p className="text-xs opacity-60">per subscriber</p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Prize Pool Card */}
         <motion.div
