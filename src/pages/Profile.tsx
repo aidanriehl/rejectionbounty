@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Grid3X3, Bookmark } from "lucide-react";
+import { Settings, Grid3X3 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { mockUserProfile, mockUserVideos, avatarLabels } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
 
 export default function Profile() {
   const [profile] = useState(mockUserProfile);
-  const [activeTab, setActiveTab] = useState<"posts" | "saved">("posts");
   const navigate = useNavigate();
 
   return (
@@ -36,7 +34,7 @@ export default function Profile() {
           <div className="flex flex-1 justify-around">
             <div className="text-center">
               <p className="text-lg font-bold text-foreground">{profile.totalCompleted}</p>
-              <p className="text-[11px] text-muted-foreground">Completed</p>
+              <p className="text-[11px] text-muted-foreground">Challenges</p>
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-foreground">{profile.streak}</p>
@@ -55,54 +53,21 @@ export default function Profile() {
           <p className="text-xs text-muted-foreground">Member since {profile.memberSince}</p>
         </div>
 
-        {/* Edit Profile button */}
-        <button
-          onClick={() => navigate("/settings")}
-          className="mb-5 w-full rounded-lg bg-muted py-1.5 text-sm font-semibold text-foreground"
-        >
-          Edit Profile
-        </button>
-
-        {/* Grid tabs (IG style) */}
+        {/* Grid tab */}
         <div className="mb-0.5 flex border-b">
-          <button
-            onClick={() => setActiveTab("posts")}
-            className={cn(
-              "flex flex-1 items-center justify-center py-2.5 transition-colors",
-              activeTab === "posts"
-                ? "border-b-2 border-foreground text-foreground"
-                : "text-muted-foreground"
-            )}
-          >
+          <div className="flex flex-1 items-center justify-center py-2.5 border-b-2 border-foreground text-foreground">
             <Grid3X3 className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setActiveTab("saved")}
-            className={cn(
-              "flex flex-1 items-center justify-center py-2.5 transition-colors",
-              activeTab === "saved"
-                ? "border-b-2 border-foreground text-foreground"
-                : "text-muted-foreground"
-            )}
-          >
-            <Bookmark className="h-5 w-5" />
-          </button>
+          </div>
         </div>
 
         {/* Video Grid (3x3, edge-to-edge like IG) */}
-        {activeTab === "posts" ? (
-          <div className="grid grid-cols-3 gap-0.5">
-            {mockUserVideos.map((url, i) => (
-              <div key={i} className="aspect-square bg-muted">
-                <img src={url} alt="" className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
-            No saved posts yet
-          </div>
-        )}
+        <div className="grid grid-cols-3 gap-0.5">
+          {mockUserVideos.map((url, i) => (
+            <div key={i} className="aspect-square bg-muted">
+              <img src={url} alt="" className="h-full w-full object-cover" />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
