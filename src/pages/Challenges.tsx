@@ -73,19 +73,8 @@ export default function Challenges() {
       <div className="mx-auto max-w-lg px-4">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-foreground">This Week's Challenges</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {(() => {
-              const now = new Date();
-              const day = now.getDay();
-              const mon = new Date(now);
-              mon.setDate(now.getDate() - ((day + 6) % 7));
-              const sun = new Date(mon);
-              sun.setDate(mon.getDate() + 6);
-              const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-              return `${fmt(mon)} - ${fmt(sun)}`;
-            })()}
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">This Week's Drop</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Resets every Sunday</p>
         </div>
 
         {/* Subscriber Card */}
