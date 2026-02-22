@@ -19,8 +19,8 @@ const App = () => (
       <BrowserRouter>
         <div className="mx-auto max-w-lg">
           <Routes>
-            <Route path="/" element={<Challenges />} />
-            <Route path="/feed" element={<Feed />} />
+            <Route path="/" element={<Feed />} />
+            <Route path="/challenges" element={<Challenges />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

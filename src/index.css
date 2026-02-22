@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,41 +6,45 @@
 
 @layer base {
   :root {
-    --background: 45 100% 97%;
-    --foreground: 260 30% 15%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 260 30% 15%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 260 30% 15%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 280 70% 55%;
+    --primary: 250 60% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 170 70% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 260 20% 92%;
-    --muted-foreground: 260 15% 45%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 35 95% 60%;
-    --accent-foreground: 35 90% 15%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 80% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 20% 88%;
-    --input: 260 20% 88%;
-    --ring: 280 70% 55%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 250 60% 52%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    --success: 150 70% 45%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
-    --prize: 45 100% 55%;
-    --prize-foreground: 45 90% 15%;
+    --prize: 45 93% 47%;
+    --prize-foreground: 0 0% 9%;
+
+    --gold: 43 96% 56%;
+    --silver: 0 0% 70%;
+    --bronze: 30 60% 50%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -53,33 +57,33 @@
   }
 
   .dark {
-    --background: 260 30% 8%;
-    --foreground: 45 30% 95%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
 
-    --card: 260 25% 12%;
-    --card-foreground: 45 30% 95%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 260 25% 12%;
-    --popover-foreground: 45 30% 95%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 280 70% 60%;
+    --primary: 250 60% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 170 65% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 14% 14%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 260 20% 18%;
-    --muted-foreground: 260 15% 60%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 35 95% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 14%;
+    --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 20% 20%;
-    --input: 260 20% 20%;
-    --ring: 280 70% 60%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 250 60% 60%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -99,10 +103,6 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Nunito', sans-serif;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }

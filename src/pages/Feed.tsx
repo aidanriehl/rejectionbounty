@@ -1,101 +1,127 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, Play } from "lucide-react";
+import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { mockFeedPosts, type FeedPost } from "@/lib/mock-data";
+import { mockFeedPosts, getWeeklyScore, type FeedPost } from "@/lib/mock-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AvatarDisplay from "@/components/AvatarDisplay";
 
-function PostCard({ post }: { post: FeedPost }) {
+function PostCard({ post, rank }: { post: FeedPost; rank?: number }) {
   const [liked, setLiked] = useState(post.liked);
   const [likeCount, setLikeCount] = useState(post.likes);
+  const imgRef = useRef<HTMLDivElement>(null);
 
   const toggleLike = () => {
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
+  const rankColors: Record<number, string> = {
+    1: "bg-prize text-prize-foreground",
+    2: "bg-silver text-foreground",
+    3: "bg-bronze text-foreground",
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-2xl border bg-card"
+      className="overflow-hidden rounded-xl border bg-card"
     >
-      {/* Video thumbnail */}
-      <div className="relative aspect-[4/3] bg-muted">
+      {/* Thumbnail */}
+      <div ref={imgRef} className="relative aspect-[4/3] bg-muted">
         <img
           src={post.thumbnailUrl}
           alt={post.challengeTitle}
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 flex items-center justify-center bg-foreground/10">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-foreground/90 shadow-lg">
-            <Play className="h-6 w-6 fill-primary text-primary" />
+        {rank && (
+          <div className={cn(
+            "absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
+            rankColors[rank] || "bg-muted text-foreground"
+          )}>
+            {rank}
           </div>
-        </div>
-        <div className="absolute bottom-2 left-2 rounded-full bg-foreground/70 px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
-          0:30
-        </div>
+        )}
       </div>
 
       {/* Post info */}
       <div className="p-3">
         <div className="mb-2 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xs font-bold text-primary-foreground">
-            {post.username[0].toUpperCase()}
-          </div>
+          <AvatarDisplay
+            avatar={post.avatar}
+            stage={post.avatarStage}
+            size="sm"
+            showAddFriend={!post.isFriend}
+            onAddFriend={() => {}}
+          />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-foreground">{post.username}</p>
+            <p className="truncate text-sm font-semibold text-foreground">{post.username}</p>
             <p className="truncate text-xs text-muted-foreground">{post.challengeTitle}</p>
           </div>
           <span className="text-xs text-muted-foreground">{post.createdAt}</span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button onClick={toggleLike} className="flex items-center gap-1.5 transition-transform active:scale-90">
-            <Heart
-              className={cn(
-                "h-5 w-5 transition-colors",
-                liked ? "fill-destructive text-destructive" : "text-muted-foreground"
-              )}
-            />
-            <span className="text-sm font-semibold text-foreground">{likeCount}</span>
-          </button>
-          <button className="flex items-center gap-1.5">
-            <MessageCircle className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">{post.comments}</span>
-          </button>
-        </div>
+        <button onClick={toggleLike} className="flex items-center gap-1.5 transition-transform active:scale-90">
+          <Heart
+            className={cn(
+              "h-5 w-5 transition-colors",
+              liked ? "fill-destructive text-destructive" : "text-muted-foreground"
+            )}
+          />
+          <span className="text-sm font-semibold text-foreground">{likeCount}</span>
+        </button>
       </div>
     </motion.div>
   );
 }
 
 export default function Feed() {
+  // Sort: This Week = time-decay score, All Time = pure likes, Friends = chronological
+  const weekPosts = [...mockFeedPosts].sort((a, b) => getWeeklyScore(b) - getWeeklyScore(a));
+  const allTimePosts = [...mockFeedPosts].sort((a, b) => b.likes - a.likes);
+  const friendPosts = mockFeedPosts.filter((p) => p.isFriend).sort((a, b) => a.daysAgo - b.daysAgo);
+
   return (
     <div className="min-h-screen pb-24 pt-4">
       <div className="mx-auto max-w-lg px-4">
-        <h1 className="mb-4 text-3xl font-bold text-foreground">Feed 📺</h1>
+        <h1 className="mb-4 text-2xl font-bold text-foreground">Feed</h1>
 
         <Tabs defaultValue="week" className="w-full">
-          <TabsList className="mb-4 w-full rounded-2xl bg-muted p-1">
-            <TabsTrigger value="week" className="flex-1 rounded-xl font-semibold">
+          <TabsList className="mb-4 w-full rounded-lg bg-muted p-1">
+            <TabsTrigger value="week" className="flex-1 rounded-md text-sm font-medium">
               This Week
             </TabsTrigger>
-            <TabsTrigger value="alltime" className="flex-1 rounded-xl font-semibold">
-              All Time 🏆
+            <TabsTrigger value="alltime" className="flex-1 rounded-md text-sm font-medium">
+              All Time
+            </TabsTrigger>
+            <TabsTrigger value="friends" className="flex-1 rounded-md text-sm font-medium">
+              Friends
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="week" className="space-y-4">
-            {mockFeedPosts.map((post) => (
+          <TabsContent value="week" className="space-y-3">
+            {weekPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </TabsContent>
 
-          <TabsContent value="alltime" className="space-y-4">
-            {[...mockFeedPosts].reverse().map((post) => (
-              <PostCard key={post.id} post={post} />
+          <TabsContent value="alltime" className="space-y-3">
+            {allTimePosts.map((post, i) => (
+              <PostCard key={post.id} post={post} rank={i + 1} />
             ))}
+          </TabsContent>
+
+          <TabsContent value="friends" className="space-y-3">
+            {friendPosts.length > 0 ? (
+              friendPosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <p className="py-12 text-center text-sm text-muted-foreground">
+                Add friends to see their videos here
+              </p>
+            )}
           </TabsContent>
         </Tabs>
       </div>
