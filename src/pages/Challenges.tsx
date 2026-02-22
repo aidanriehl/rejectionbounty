@@ -107,9 +107,9 @@ export default function Challenges() {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs opacity-60">Pool increases</p>
-              <p className="text-lg font-bold">+$3.00</p>
-              <p className="text-xs opacity-60">per subscriber</p>
+              <p className="text-xs opacity-60 leading-tight">Monthly pool increases</p>
+              <p className="text-xs opacity-60 leading-tight">per subscriber</p>
+              <p className="text-lg font-bold">+$3.12</p>
             </div>
           </div>
         </motion.div>
