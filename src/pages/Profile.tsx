@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, ArrowLeft, X } from "lucide-react";
+import { Settings, ArrowLeft, Grid3X3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { mockUserProfile, mockUserVideos, avatarLabels } from "@/lib/mock-data";
@@ -57,6 +57,11 @@ export default function Profile() {
             </p>
           </CardContent>
         </Card>
+
+        {/* Grid icon + divider */}
+        <div className="mb-0.5 flex justify-center border-b border-border pb-2">
+          <Grid3X3 className="h-5 w-5 text-foreground" />
+        </div>
 
         {/* Video Grid (3x3, edge-to-edge like IG) */}
         <div className="grid grid-cols-3 gap-0.5">
