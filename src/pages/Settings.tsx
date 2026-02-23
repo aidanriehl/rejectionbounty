@@ -130,23 +130,6 @@ export default function SettingsPage() {
             )}
           </div>
 
-          {/* Email (read-only placeholder) */}
-          <div className="flex items-center justify-between border-b px-4 py-3">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">📧</span>
-              <span className="text-sm font-medium text-foreground">Email</span>
-            </div>
-            <span className="text-sm text-muted-foreground">user@example.com</span>
-          </div>
-
-          {/* Change Password */}
-          <button className="flex w-full items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-3">
-              <KeyRound className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">Change Password</span>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </button>
         </div>
 
         {/* Avatar Section */}
