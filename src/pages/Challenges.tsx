@@ -56,9 +56,11 @@ export default function Challenges() {
       if (newCount === 5) {
         fireBigConfetti();
         playBigWin();
+        toast({ title: "🏆 All 5 done!", description: "You crushed it this week!" });
       } else {
         fireConfetti();
         playPop();
+        toast({ title: "✅ Challenge completed!", description: challenge.title });
       }
 
       return next;
