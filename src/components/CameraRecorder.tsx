@@ -157,7 +157,7 @@ export default function CameraRecorder({ onRecorded, onClose, challengeTitle }: 
         </div>
 
         {/* Bottom actions */}
-        <div className="absolute bottom-8 inset-x-0 flex justify-center gap-4 px-6">
+        <div className="absolute bottom-24 inset-x-0 flex justify-center gap-4 px-6">
           <button
             onClick={handleRetake}
             className="flex-1 rounded-full border border-white/30 py-3 text-sm font-semibold text-white"
@@ -251,7 +251,7 @@ export default function CameraRecorder({ onRecorded, onClose, challengeTitle }: 
       )}
 
       {/* Bottom controls */}
-      <div className="absolute bottom-10 inset-x-0 flex items-center justify-center">
+      <div className="absolute bottom-24 inset-x-0 flex items-center justify-center">
         {isRecording ? (
           <button
             onClick={stopRecording}
