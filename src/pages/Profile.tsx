@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, ArrowLeft, Grid3X3, Camera } from "lucide-react";
+import { Settings, ArrowLeft, Grid3X3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { avatarLabels } from "@/lib/mock-data";
@@ -147,11 +147,8 @@ export default function Profile() {
         </div>
 
         {/* Empty state for video grid */}
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Camera className="h-10 w-10 text-muted-foreground/50 mb-3" />
-          <p className="text-sm text-muted-foreground">
-            Complete challenges and post videos to fill your grid
-          </p>
+        <div className="flex items-center justify-center py-16">
+          <p className="text-sm text-muted-foreground">No videos uploaded yet</p>
         </div>
       </div>
     </div>
