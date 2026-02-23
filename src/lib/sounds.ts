@@ -79,3 +79,41 @@ export function playBigWin() {
     });
   } catch {}
 }
+
+/** Cascade / pieces clicking into place — a wave of short percussive ticks */
+export function playCascade(count = 10, durationMs = 800) {
+  try {
+    const a = ctx();
+    const t = a.currentTime;
+    const interval = (durationMs / 1000) / count;
+
+    for (let i = 0; i < count; i++) {
+      const start = t + i * interval;
+      // Short noise burst (click/tick)
+      const bufSize = a.sampleRate * 0.03;
+      const buf = a.createBuffer(1, bufSize, a.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let j = 0; j < bufSize; j++) {
+        data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / bufSize, 8);
+      }
+      const src = a.createBufferSource();
+      src.buffer = buf;
+
+      // Bandpass to make it sound like a wooden/metallic click
+      const bp = a.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = 2000 + i * 200; // rising pitch across the wave
+      bp.Q.value = 5;
+
+      const g = a.createGain();
+      g.gain.setValueAtTime(0.25, start);
+      g.gain.exponentialRampToValueAtTime(0.005, start + 0.06);
+
+      src.connect(bp);
+      bp.connect(g);
+      g.connect(a.destination);
+      src.start(start);
+      src.stop(start + 0.06);
+    }
+  } catch {}
+}
