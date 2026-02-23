@@ -14,14 +14,14 @@ import DropReveal from "@/components/DropReveal";
 
 const progressMessages: Record<number, string> = {
   1: "Great start!",
-  2: "We're getting somewhere...",
-  3: "Halfway there!",
+  2: "Keep going...",
+  3: "Over halfway!",
   4: "One more to go!",
-  5: "🔥 Halfway done!",
-  6: "Keep pushing!",
-  7: "Almost there...",
-  8: "So close!",
-  9: "One more to go!",
+  5: "🔥 Goal reached!",
+  6: "Going above & beyond!",
+  7: "On fire!",
+  8: "Unstoppable!",
+  9: "One more for perfection!",
   10: "🏆 LEGEND!",
 };
 
@@ -145,10 +145,10 @@ export default function Challenges() {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">Progress</span>
             <span className="text-sm font-semibold text-primary">
-              {completed}/{completed <= 5 ? 5 : 10} {progressMessages[completed] || ""}
+              {completed}/5 {progressMessages[completed] || ""}
             </span>
           </div>
-          <Progress value={(completed / 10) * 100} className="h-2 bg-muted" />
+          <Progress value={Math.min((completed / 5) * 100, 100)} className="h-2 bg-muted" />
         </div>
 
         {/* Challenge List — unified pill container */}
