@@ -151,7 +151,8 @@ export default function Challenges() {
           <Progress value={Math.min((completed / 5) * 100, 100)} className="h-2 bg-muted" />
         </div>
 
-        {/* Challenge List — unified pill container */}
+        {/* Challenge List */}
+        <p className="mb-2 text-sm font-semibold text-foreground">Complete 5 of these 10</p>
         <div className="overflow-hidden rounded-xl border bg-card">
           <AnimatePresence>
             {challenges.map((challenge, i) => (
