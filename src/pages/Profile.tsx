@@ -7,6 +7,31 @@ import { mockUserProfile, mockUserVideos, avatarLabels } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+const MILESTONES = [10, 50, 100, 150, 200] as const;
+const MEDALS: Record<number, { emoji: string; label: string }> = {
+  10: { emoji: "🥉", label: "Bronze" },
+  50: { emoji: "🥈", label: "Silver" },
+  100: { emoji: "🥇", label: "Gold" },
+  150: { emoji: "💎", label: "Diamond" },
+  200: { emoji: "👑", label: "Champion" },
+};
+
+function getMilestone(completed: number) {
+  // Find current milestone bracket
+  for (let i = MILESTONES.length - 1; i >= 0; i--) {
+    if (completed >= MILESTONES[i]) {
+      const next = MILESTONES[i + 1];
+      if (next) {
+        return { current: completed, goal: next, medal: MEDALS[MILESTONES[i]] };
+      }
+      // Maxed out
+      return { current: completed, goal: MILESTONES[i], medal: MEDALS[MILESTONES[i]] };
+    }
+  }
+  // Below first milestone
+  return { current: completed, goal: MILESTONES[0], medal: null };
+}
+
 export default function Profile() {
   const [profile] = useState(mockUserProfile);
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
@@ -35,28 +60,45 @@ export default function Profile() {
         {/* Streak Card */}
         <Card className="mb-3">
           <CardContent className="p-4">
-            <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <span className="text-2xl font-bold text-foreground">🔥 {profile.streak}</span>
                 <span className="text-lg font-bold text-foreground"> Day Streak</span>
               </div>
               <p className="text-xs text-muted-foreground">Best: {profile.bestStreak} days</p>
             </div>
-            <Progress value={(profile.streak / 7) * 100} className="h-2" />
-            <p className="mt-1 text-[10px] text-muted-foreground text-right">{profile.streak}/7 this week</p>
           </CardContent>
         </Card>
 
         {/* Challenges Card */}
-        <Card className="mb-5">
-          <CardContent className="p-4">
-            <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
-            <span className="text-lg font-bold text-foreground"> Challenges Completed</span>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% completion rate
-            </p>
-          </CardContent>
-        </Card>
+        {(() => {
+          const ms = getMilestone(profile.totalCompleted);
+          const progressPct = Math.min((ms.current / ms.goal) * 100, 100);
+          return (
+            <Card className="mb-5">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
+                    <span className="text-lg font-bold text-foreground"> Challenges Completed</span>
+                  </div>
+                  {ms.medal && (
+                    <span className="text-2xl" title={ms.medal.label}>{ms.medal.emoji}</span>
+                  )}
+                </div>
+                <div className="mt-2">
+                  <Progress value={progressPct} className="h-2" />
+                  <p className="mt-1 text-[10px] text-muted-foreground text-right">
+                    {ms.current}/{ms.goal} challenges
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% weekly completion rate
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Grid icon + divider */}
         <div className="mb-0.5 flex justify-center border-b border-border pb-2">
