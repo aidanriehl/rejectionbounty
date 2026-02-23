@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { fireBigConfetti } from "@/lib/confetti";
 import { playBigWin, playPop } from "@/lib/sounds";
 
 interface DropRevealProps {
@@ -177,11 +176,10 @@ export default function DropReveal({ onRevealComplete }: DropRevealProps) {
       setStage(3);
       if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       playBigWin();
-      fireBigConfetti();
       setExiting(true);
       setTimeout(() => {
         onRevealComplete();
-      }, 1200);
+      }, 600);
     }
   }, [stage, exiting, onRevealComplete]);
 
