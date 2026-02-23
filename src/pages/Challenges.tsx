@@ -80,9 +80,7 @@ export default function Challenges() {
         </div>
 
         {/* Subscriber Card */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background"
         >
           <div className="flex items-center justify-between">
@@ -101,12 +99,10 @@ export default function Challenges() {
               <p className="text-lg font-bold">+$3.12</p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Prize Pool Card */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mb-5 overflow-hidden rounded-xl bg-foreground p-4 text-background"
         >
           <div className="flex items-center justify-between">
@@ -127,7 +123,7 @@ export default function Challenges() {
               <p className="text-lg font-bold">{days}d {hours}h</p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Progress */}
         <div className="mb-5">
