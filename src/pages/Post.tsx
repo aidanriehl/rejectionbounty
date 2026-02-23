@@ -1,7 +1,10 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { X, Upload, Image, Film } from "lucide-react";
+import { X, Upload, Film, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+type UploadStatus = "idle" | "getting-url" | "uploading" | "processing" | "done" | "error";
 
 export default function PostPage() {
   const navigate = useNavigate();
@@ -9,21 +12,133 @@ export default function PostPage() {
   const challengeTitle = (location.state as any)?.challengeTitle || "Challenge";
   const [caption, setCaption] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [thumbPosition, setThumbPosition] = useState(0); // 0–100
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [videoId, setVideoId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const thumbLabel = useMemo(() => {
-    const totalSec = 30; // assume 30s video
-    const sec = Math.round((thumbPosition / 100) * totalSec);
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  }, [thumbPosition]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handlePost = () => {
+    // Validate: max 30s video, max 100MB
+    if (file.size > 100 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 100MB", variant: "destructive" });
+      return;
+    }
+
+    setVideoFile(file);
+    setUploadStatus("idle");
+    setVideoId(null);
+  };
+
+  const uploadVideo = useCallback(async () => {
+    if (!videoFile) return;
+
+    try {
+      // Step 1: Get direct upload URL from our edge function
+      setUploadStatus("getting-url");
+      const { data, error } = await supabase.functions.invoke("upload-video", {
+        body: { maxDurationSeconds: 30 },
+      });
+
+      if (error || !data?.uploadURL) {
+        throw new Error(error?.message || "Failed to get upload URL");
+      }
+
+      const { uploadURL, videoId: vid } = data;
+      setVideoId(vid);
+
+      // Step 2: Upload directly to Cloudflare Stream
+      setUploadStatus("uploading");
+      const formData = new FormData();
+      formData.append("file", videoFile);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", uploadURL);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed with status ${xhr.status}`));
+        };
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.send(formData);
+      });
+
+      setUploadStatus("processing");
+
+      // Step 3: Poll for video ready status
+      let attempts = 0;
+      const maxAttempts = 30;
+      while (attempts < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const { data: videoData } = await supabase.functions.invoke("get-video", {
+          body: {},
+          headers: {},
+          method: "GET",
+        });
+
+        // Use fetch directly for GET with query params
+        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+        const res = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/get-video?videoId=${vid}`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+          }
+        );
+        const status = await res.json();
+
+        if (status.readyToStream) {
+          setUploadStatus("done");
+          toast({ title: "Video uploaded! 🎬" });
+          return;
+        }
+        attempts++;
+      }
+
+      // If we get here, it's still processing but uploaded
+      setUploadStatus("done");
+      toast({ title: "Video uploaded! Processing may continue." });
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      setUploadStatus("error");
+      toast({
+        title: "Upload failed",
+        description: err.message || "Something went wrong",
+        variant: "destructive",
+      });
+    }
+  }, [videoFile]);
+
+  const handlePost = async () => {
+    if (videoFile && uploadStatus === "idle") {
+      await uploadVideo();
+    }
+    // TODO: save post to database with videoId + caption
     toast({ title: "Posted to feed!" });
     navigate("/challenges");
   };
+
+  const statusLabel: Record<UploadStatus, string> = {
+    idle: "",
+    "getting-url": "Preparing upload…",
+    uploading: `Uploading… ${uploadProgress}%`,
+    processing: "Processing video…",
+    done: "Ready!",
+    error: "Upload failed",
+  };
+
+  const isUploading = ["getting-url", "uploading", "processing"].includes(uploadStatus);
 
   return (
     <div className="min-h-screen pb-24 pt-4">
@@ -48,16 +163,17 @@ export default function PostPage() {
           type="file"
           accept="video/*"
           className="hidden"
-          onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+          onChange={handleFileChange}
         />
         <button
           onClick={() => fileRef.current?.click()}
-          className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted/30 py-10 text-sm text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+          disabled={isUploading}
+          className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted/30 py-10 text-sm text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:opacity-50"
         >
           {videoFile ? (
             <>
               <Film className="h-5 w-5" />
-              <span className="font-medium">{videoFile.name}</span>
+              <span className="font-medium truncate max-w-[200px]">{videoFile.name}</span>
             </>
           ) : (
             <>
@@ -67,31 +183,32 @@ export default function PostPage() {
           )}
         </button>
 
-        {/* Thumbnail picker — only show when video is selected */}
-        {videoFile && (
-          <div className="mb-4">
-            <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Image className="h-3.5 w-3.5" />
-              Choose thumbnail
-            </p>
-            {/* Preview frame */}
-            <div className="mb-3 flex h-40 items-center justify-center rounded-xl bg-muted">
-              <span className="text-2xl font-bold text-muted-foreground">{thumbLabel}</span>
-            </div>
-            {/* Slider */}
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={thumbPosition}
-              onChange={(e) => setThumbPosition(Number(e.target.value))}
-              className="w-full accent-primary"
+        {/* Upload status */}
+        {uploadStatus !== "idle" && (
+          <div className="mb-4 flex items-center gap-2 text-sm">
+            {isUploading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+            {uploadStatus === "done" && <CheckCircle2 className="h-4 w-4 text-success" />}
+            <span
+              className={
+                uploadStatus === "error"
+                  ? "text-destructive"
+                  : uploadStatus === "done"
+                  ? "text-success"
+                  : "text-muted-foreground"
+              }
+            >
+              {statusLabel[uploadStatus]}
+            </span>
+          </div>
+        )}
+
+        {/* Upload progress bar */}
+        {uploadStatus === "uploading" && (
+          <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
             />
-            <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
-              <span>0:00</span>
-              <span>{thumbLabel}</span>
-              <span>0:30</span>
-            </div>
           </div>
         )}
 
@@ -107,9 +224,10 @@ export default function PostPage() {
         {/* Post button */}
         <button
           onClick={handlePost}
-          className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          disabled={isUploading}
+          className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
-          Post to Feed
+          {isUploading ? "Uploading…" : "Post to Feed"}
         </button>
 
         {/* Skip */}
