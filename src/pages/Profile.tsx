@@ -8,13 +8,40 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 const MILESTONES = [10, 50, 100, 150, 200] as const;
-const MEDALS: Record<number, { emoji: string; label: string }> = {
-  10: { emoji: "🥉", label: "Bronze" },
-  50: { emoji: "🥈", label: "Silver" },
-  100: { emoji: "🥇", label: "Gold" },
-  150: { emoji: "💎", label: "Diamond" },
-  200: { emoji: "👑", label: "Champion" },
+
+type MedalTier = "bronze" | "silver" | "gold" | "diamond" | "champion";
+
+const MEDAL_COLORS: Record<MedalTier, { fill: string; stroke: string; ribbon: string }> = {
+  bronze:   { fill: "#CD7F32", stroke: "#A0522D", ribbon: "#8B4513" },
+  silver:   { fill: "#C0C0C0", stroke: "#A8A8A8", ribbon: "#808080" },
+  gold:     { fill: "#FFD700", stroke: "#DAA520", ribbon: "#B8860B" },
+  diamond:  { fill: "#B9F2FF", stroke: "#7EC8E3", ribbon: "#4A90D9" },
+  champion: { fill: "#E8D44D", stroke: "#DAA520", ribbon: "#8B0000" },
 };
+
+const MEDALS: Record<number, { tier: MedalTier; label: string }> = {
+  10:  { tier: "bronze", label: "Bronze" },
+  50:  { tier: "silver", label: "Silver" },
+  100: { tier: "gold", label: "Gold" },
+  150: { tier: "diamond", label: "Diamond" },
+  200: { tier: "champion", label: "Champion" },
+};
+
+function MedalIcon({ tier, size = 28 }: { tier: MedalTier; size?: number }) {
+  const c = MEDAL_COLORS[tier];
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Ribbon */}
+      <path d="M12 2L16 12L20 2" stroke={c.ribbon} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      {/* Circle */}
+      <circle cx="16" cy="20" r="10" fill={c.fill} stroke={c.stroke} strokeWidth="1.5" />
+      {/* Inner circle */}
+      <circle cx="16" cy="20" r="6.5" fill="none" stroke={c.stroke} strokeWidth="0.8" opacity="0.5" />
+      {/* Star */}
+      <path d="M16 15.5L17.5 18.5L20.5 19L18.2 21.2L18.8 24.5L16 23L13.2 24.5L13.8 21.2L11.5 19L14.5 18.5Z" fill={c.stroke} opacity="0.6" />
+    </svg>
+  );
+}
 
 function getMilestone(completed: number) {
   // Find current milestone bracket
@@ -83,18 +110,20 @@ export default function Profile() {
                     <span className="text-lg font-bold text-foreground">Challenges Completed</span>
                   </p>
                   {ms.medal && (
-                    <span className="text-2xl" title={ms.medal.label}>{ms.medal.emoji}</span>
+                    <MedalIcon tier={ms.medal.tier} />
                   )}
                 </div>
                 <div className="mt-2">
                   <Progress value={progressPct} className="h-2" />
-                  <p className="mt-1 text-[10px] text-muted-foreground text-right">
-                    {ms.current}/{ms.goal} challenges
-                  </p>
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-[10px] text-muted-foreground">
+                      {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% weekly completion rate
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {ms.current}/{ms.goal}
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% weekly completion rate
-                </p>
               </CardContent>
             </Card>
           );
