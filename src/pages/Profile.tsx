@@ -89,7 +89,7 @@ export default function Profile() {
           >
             <button
               onClick={() => setSelectedVideo(null)}
-              className="absolute top-4 left-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm"
+              className="absolute top-4 left-4 z-10 text-white"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
