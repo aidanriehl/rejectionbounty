@@ -1,92 +1,48 @@
 
 
-# Weekly Challenge Backlog System
+## Weekly Drop Reveal Animation
 
-## Overview
-Create a database-driven challenge system where you pre-load many weeks of challenges at once. Each Sunday, the next batch of 10 automatically becomes the active set. You'll manage this through a simple admin page in the app (only visible to you).
+A full-screen reveal experience that plays when users open the Challenges page and haven't "unwrapped" the current week's drop yet. Inspired by Claim's tap-to-reveal mechanic.
 
-## How It Works
+### The Experience
 
-1. You load challenges into the database, each tagged with a `week_number` (1, 2, 3, etc.)
-2. A `challenge_weeks` table tracks which week is currently active and when it started
-3. Every Sunday, a scheduled backend function advances to the next week automatically
-4. Users see only the current week's 10 challenges
+1. **Full-screen overlay** with a bold gradient background (deep purple to black, matching the app's primary color)
+2. **A bounty chest graphic** (fits the "Rejection Bounty" brand) built as an SVG -- a stylized treasure chest with a lock
+3. **3 taps to unlock:**
+   - **Tap 1**: Chest shakes, lock cracks, particles fly out. Text: "Keep going..."
+   - **Tap 2**: Chest lid lifts slightly, golden light leaks out, more particles. Text: "Almost there..."
+   - **Tap 3**: Chest bursts open, big confetti explosion, golden light fills screen, then transitions to reveal the challenge list with a staggered card-flip animation
+4. **Challenge reveal**: Each challenge card fades/scales in one-by-one with a short stagger delay
 
-## Database Changes
+### Visual Details
 
-### New tables
+- The chest SVG will use the app's `primary` and `gold` color tokens
+- Each tap stage has a subtle scale bounce (framer-motion spring)
+- The "crack" and "light leak" effects are layered div glows with opacity transitions
+- Final reveal uses the existing `fireBigConfetti()` function
+- A pulsing "Tap to open" prompt below the chest guides the user
 
-**`challenges`** -- stores all challenges across all weeks
-- `id` (UUID, primary key)
-- `week_number` (integer) -- which week batch this belongs to
-- `position` (integer, 1-10) -- order within the week
-- `title` (text)
-- `description` (text)
-- `emoji` (text)
-- `created_at` (timestamp)
+### State Management
 
-**`challenge_weeks`** -- tracks current active week
-- `id` (integer, always 1 -- single row)
-- `current_week` (integer, default 1)
-- `week_started_at` (timestamp)
+- A `dropRevealed` flag stored in `localStorage` (keyed by week number) tracks whether the user has already seen the reveal
+- If already revealed, the Challenges page loads normally with no animation
+- The reveal only plays once per weekly reset cycle
 
-**`user_challenges`** -- tracks each user's completions
-- `id` (UUID, primary key)
-- `user_id` (UUID, references auth.users)
-- `challenge_id` (UUID, references challenges)
-- `completed_at` (timestamp)
+### Technical Plan
 
-**`user_roles`** -- admin role (required for security)
-- `id` (UUID)
-- `user_id` (UUID, references auth.users)
-- `role` (enum: admin, user)
+1. **New component**: `src/components/DropReveal.tsx`
+   - Full-screen overlay with the 3-stage tap interaction
+   - Custom `BountyChest` SVG component with 3 visual states (locked, cracking, open)
+   - Framer Motion for shake, scale, and transition animations
+   - Calls `fireBigConfetti()` on final reveal
 
-### RLS Policies
-- `challenges`: everyone can read; only admins can insert/update/delete
-- `challenge_weeks`: everyone can read; only admins can update
-- `user_challenges`: users can read/insert their own completions
-- `user_roles`: only the `has_role()` security definer function accesses this
+2. **Update**: `src/pages/Challenges.tsx`
+   - Add `dropRevealed` state initialized from localStorage
+   - If not revealed, render `<DropReveal />` overlay instead of the challenge list
+   - On reveal complete, set localStorage flag and fade into normal challenge view
 
-### Scheduled function (cron)
-- A backend function runs every Sunday at midnight
-- It increments `current_week` in `challenge_weeks` and resets the week timer
-- Uses `pg_cron` + `pg_net` to call an edge function on schedule
+3. **Update**: `src/lib/mock-data.ts`
+   - Add helper `getCurrentWeekKey()` to generate a consistent week identifier for the localStorage key
 
-## App Changes
-
-### Admin page (`/admin`)
-- Only accessible if your user has the `admin` role
-- Simple form to bulk-add challenges: pick a week number, then enter 10 challenge titles + emojis
-- View upcoming weeks and edit/reorder challenges
-- Button to manually advance the week (for testing)
-
-### Challenges page update
-- Fetch current week's challenges from the database instead of mock data
-- Track completions in `user_challenges` table instead of local state
-- Keep the existing UI (progress bar, confetti, upload button)
-
-### Route guard
-- Add `/admin` route, only rendered when user has admin role
-
-## File Changes
-
-### New files
-- `supabase/functions/advance-week/index.ts` -- edge function to advance the week
-- `src/pages/Admin.tsx` -- admin page for managing challenge backlog
-- `src/hooks/useAdmin.ts` -- hook to check admin role
-
-### Modified files
-- `src/pages/Challenges.tsx` -- fetch from database instead of mock data
-- `src/App.tsx` -- add `/admin` route with role guard
-
-## Step-by-step
-
-1. Create database tables (`challenges`, `challenge_weeks`, `user_challenges`, `user_roles`) with RLS
-2. Create `has_role()` security definer function
-3. Assign your user the admin role
-4. Build the `advance-week` edge function
-5. Set up the Sunday cron job
-6. Build the admin page for loading challenges
-7. Update the Challenges page to read from the database
-8. Add admin route to App.tsx
+4. **No new dependencies needed** -- framer-motion and canvas-confetti are already installed
 
