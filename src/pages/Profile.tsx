@@ -88,9 +88,10 @@ export default function Profile() {
         <Card className="mb-3">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <p className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-foreground">🔥 {profile.streak}</span>
-                <span className="text-lg font-bold text-foreground">Day Streak</span>
+              <p className="flex items-center gap-2">
+                <span className="text-2xl leading-none">🔥</span>
+                <span className="text-2xl font-bold text-foreground leading-none">{profile.streak}</span>
+                <span className="text-lg font-bold text-foreground leading-none">Day Streak</span>
               </p>
               <p className="text-xs text-muted-foreground">Best: {profile.bestStreak} days</p>
             </div>
@@ -104,13 +105,13 @@ export default function Profile() {
           return (
             <Card className="mb-5">
               <CardContent className="p-4">
-                <div className="flex items-baseline gap-2">
-                  <p className="flex items-baseline gap-2">
+                <div className="flex items-center gap-2">
+                  <p className="flex items-center gap-2">
                     {ms.medal && (
-                      <span className="relative top-0.5"><MedalIcon tier={ms.medal.tier} size={28} /></span>
+                      <span className="flex items-center"><MedalIcon tier={ms.medal.tier} size={28} /></span>
                     )}
-                    <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
-                    <span className="text-lg font-bold text-foreground">Challenges Completed</span>
+                    <span className="text-2xl font-bold text-foreground leading-none">{profile.totalCompleted}</span>
+                    <span className="text-lg font-bold text-foreground leading-none">Challenges Completed</span>
                   </p>
                 </div>
                 <div className="mt-2">
