@@ -65,7 +65,7 @@ export default function Setup({ userId, onComplete }: SetupProps) {
         <Input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="your_username"
+          placeholder="@codymaverick"
           maxLength={20}
           className="h-12 text-center text-lg"
           autoFocus
