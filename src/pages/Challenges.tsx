@@ -146,11 +146,11 @@ export default function Challenges() {
             {challenges.map((challenge, i) => (
               <motion.div
                 key={challenge.id}
-                initial={justRevealed ? { opacity: 0, y: -30, scale: 0.9 } : { opacity: 0, x: -10 }}
+                initial={justRevealed ? { opacity: 0, y: -30, scale: 0.9 } : false}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                 transition={justRevealed
                   ? { delay: i * 0.09, type: "spring", stiffness: 400, damping: 20 }
-                  : { delay: i * 0.03 }
+                  : { duration: 0 }
                 }
                 className={cn(
                   "group flex items-center gap-3 px-4 py-3 transition-all",
