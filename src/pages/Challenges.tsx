@@ -152,7 +152,7 @@ export default function Challenges() {
         </div>
 
         {/* Challenge List */}
-        <p className="mb-2 text-sm font-semibold text-foreground">Complete 5 of these 10</p>
+        <p className="mb-2 text-sm font-semibold text-foreground">Complete 5 challenges of these 10</p>
         <div className="overflow-hidden rounded-xl border bg-card">
           <AnimatePresence>
             {challenges.map((challenge, i) => (
