@@ -72,43 +72,9 @@ export default function PostPage() {
         xhr.send(formData);
       });
 
-      setUploadStatus("processing");
-
-      // Step 3: Poll for video ready status
-      let attempts = 0;
-      const maxAttempts = 30;
-      while (attempts < maxAttempts) {
-        await new Promise((r) => setTimeout(r, 2000));
-        const { data: videoData } = await supabase.functions.invoke("get-video", {
-          body: {},
-          headers: {},
-          method: "GET",
-        });
-
-        // Use fetch directly for GET with query params
-        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-        const res = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/get-video?videoId=${vid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            },
-          }
-        );
-        const status = await res.json();
-
-        if (status.readyToStream) {
-          setUploadStatus("done");
-          toast({ title: "Video uploaded! 🎬" });
-          return;
-        }
-        attempts++;
-      }
-
-      // If we get here, it's still processing but uploaded
+      // Upload complete — no need to wait for Cloudflare processing
       setUploadStatus("done");
-      toast({ title: "Video uploaded! Processing may continue." });
+      toast({ title: "Video uploaded! 🎬" });
     } catch (err: any) {
       console.error("Upload error:", err);
       setUploadStatus("error");
