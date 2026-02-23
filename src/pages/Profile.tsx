@@ -61,10 +61,10 @@ export default function Profile() {
         <Card className="mb-3">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1">
+              <p className="flex items-baseline gap-1.5">
                 <span className="text-2xl font-bold text-foreground">🔥 {profile.streak}</span>
-                <span className="text-lg font-bold text-foreground"> Day Streak</span>
-              </div>
+                <span className="text-lg font-bold text-foreground">Day Streak</span>
+              </p>
               <p className="text-xs text-muted-foreground">Best: {profile.bestStreak} days</p>
             </div>
           </CardContent>
@@ -78,10 +78,10 @@ export default function Profile() {
             <Card className="mb-5">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <p className="flex items-baseline gap-1.5">
                     <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
-                    <span className="text-lg font-bold text-foreground"> Challenges Completed</span>
-                  </div>
+                    <span className="text-lg font-bold text-foreground">Challenges Completed</span>
+                  </p>
                   {ms.medal && (
                     <span className="text-2xl" title={ms.medal.label}>{ms.medal.emoji}</span>
                   )}
