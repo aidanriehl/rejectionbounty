@@ -1,43 +1,66 @@
 
+# Onboarding Page with Google + Apple Sign-In
 
-# Profile Page Redesign
+## Overview
+Create a single-page onboarding screen with Google and Apple sign-in buttons. After signing in, users see a quick username input before entering the app. An avatar creature is auto-assigned randomly.
 
-## What's Changing
+This requires connecting a backend (Lovable Cloud) for authentication.
 
-Remove the Instagram-style stats row and "Member since" text. Replace with two stacked full-width cards below the avatar and username.
+## Flow
 
-## New Layout (top to bottom)
+1. **Onboarding screen** (`/onboarding`) -- the landing page for unauthenticated users
+   - App logo/name and tagline (e.g. "Face your fears. One challenge at a time.")
+   - "Sign in with Google" button
+   - "Sign in with Apple" button
+   - Clean, minimal design matching the app's style
 
-1. **Top bar** -- username left, settings gear right (stays the same)
-2. **Avatar** -- centered, with stage label below (stays the same)
-3. **Streak Card** -- full-width card containing:
-   - Current streak number with fire emoji (e.g. "4 🔥")
-   - Label: "Day Streak"
-   - Progress bar showing progress toward a 7-day weekly goal
-   - Best streak displayed as secondary text (e.g. "Best: 12 days")
-4. **Challenges Card** -- full-width card containing:
-   - Total completed count (e.g. "47")
-   - Label: "Challenges Completed"
-   - Completion rate as secondary text (e.g. "78% completion rate")
-5. **Video Grid** -- the 3x3 grid stays as-is below the cards
+2. **Username setup** (`/setup`) -- shown once after first sign-in
+   - Simple input: "Pick a username"
+   - Auto-assigns a random avatar creature (dragon, tree, fox, owl, cat)
+   - "Let's go" button to confirm and enter the app
 
-## What's Removed
+3. **Auth guard** -- redirects unauthenticated users to `/onboarding`, and authenticated users without a username to `/setup`
 
-- The side-by-side stats row (Challenges / Streak / Friends)
-- The "DailyRejecter" name repetition and "Member since Jan 2026" text below the stats
-- Friends count entirely
+## Backend Requirements
 
-## Technical Details
+Before implementing, we need to **connect Lovable Cloud** to your project. This gives you:
+- Supabase auth with Google + Apple sign-in (managed for you)
+- A database for storing user profiles (username, avatar, streak, etc.)
 
-### File: `src/pages/Profile.tsx`
-- Remove the stats row (`flex flex-1 justify-around` block with Challenges/Streak/Friends)
-- Remove the name + bio section ("Member since" text)
-- Add a `bestStreak` field usage from mock data (will add to mock data)
-- Add two stacked Card components using the existing `Card` UI component
-- First card: streak number, fire emoji, 7-day progress bar (using the existing `Progress` component), best streak text
-- Second card: total completed, "Challenges Completed" label, completion rate text
+### Database
 
-### File: `src/lib/mock-data.ts`
-- Add `bestStreak` field to `UserProfile` interface and mock data (e.g. 12)
-- Add `totalAttempted` field to calculate completion rate (e.g. 60, giving 78%)
+A `profiles` table will be created:
+- `id` (UUID, references auth.users)
+- `username` (text, unique)
+- `avatar` (text -- dragon/tree/fox/owl/cat)
+- `avatar_stage` (integer, default 0)
+- `streak` (integer, default 0)
+- `total_completed` (integer, default 0)
+- `created_at` (timestamp)
 
+A trigger will auto-create a profile row when a user signs up.
+
+### RLS Policies
+- Users can read any profile (for the feed)
+- Users can only update their own profile
+
+## File Changes
+
+### New files
+- `src/lib/supabase.ts` -- Supabase client setup
+- `src/pages/Onboarding.tsx` -- Sign-in screen with Google/Apple buttons
+- `src/pages/Setup.tsx` -- Username picker (post-signup)
+- `src/hooks/useAuth.ts` -- Auth state hook (current user, loading, profile)
+
+### Modified files
+- `src/App.tsx` -- Add routes for `/onboarding` and `/setup`, wrap with auth context, redirect logic
+- `src/lib/mock-data.ts` -- Keep mock data for now but the profile will eventually come from the database
+
+## Step-by-step
+
+1. Connect Lovable Cloud to the project
+2. Create the `profiles` table with trigger and RLS
+3. Build the Supabase client and auth hook
+4. Build the Onboarding page (Google + Apple buttons, app branding)
+5. Build the Setup page (username input, random avatar assignment)
+6. Update App.tsx routing to guard pages behind auth
