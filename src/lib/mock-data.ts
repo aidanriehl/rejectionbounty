@@ -110,6 +110,14 @@ export const getTimeUntilSunday = () => {
   return { days, hours };
 };
 
+// Generate a consistent week key for localStorage (resets every Sunday)
+export const getCurrentWeekKey = () => {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const weekNum = Math.ceil(((now.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
+  return `drop-revealed-${now.getFullYear()}-w${weekNum}`;
+};
+
 // Time-decay scoring for "This Week" feed
 export const getWeeklyScore = (post: FeedPost) => {
   const recencyBonus = Math.max(0, 7 - post.daysAgo) * 10;
