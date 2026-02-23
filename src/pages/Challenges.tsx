@@ -9,6 +9,7 @@ import { fireConfetti, fireBigConfetti, fireEpicConfetti } from "@/lib/confetti"
 import { playPop, playBigWin, playEpicWin, playCascade } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
+import WeeklySummary from "@/components/WeeklySummary";
 import DropReveal from "@/components/DropReveal";
 
 const progressMessages: Record<number, string> = {
@@ -28,6 +29,7 @@ export default function Challenges() {
   const navigate = useNavigate();
   const weekKey = getCurrentWeekKey();
   const [dropRevealed, setDropRevealed] = useState(() => localStorage.getItem(weekKey) === "true");
+  const [summaryDone, setSummaryDone] = useState(() => localStorage.getItem(weekKey) === "true");
   const [justRevealed, setJustRevealed] = useState(false);
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
@@ -79,7 +81,10 @@ export default function Challenges() {
   return (
     <>
       <AnimatePresence>
-        {!dropRevealed && <DropReveal onRevealComplete={handleRevealComplete} />}
+        {!summaryDone && <WeeklySummary onContinue={() => setSummaryDone(true)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {summaryDone && !dropRevealed && <DropReveal onRevealComplete={handleRevealComplete} />}
       </AnimatePresence>
     <div className="min-h-screen pb-24 pt-4">
       <div className="mx-auto max-w-lg px-4">
