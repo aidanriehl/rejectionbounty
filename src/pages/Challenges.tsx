@@ -5,20 +5,24 @@ import { Check, Clock, Trophy, Upload, Users, Video, FolderOpen } from "lucide-r
 import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, getCurrentWeekKey, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
-import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
-import { playPop, playBigWin, playCascade } from "@/lib/sounds";
+import { fireConfetti, fireBigConfetti, fireEpicConfetti } from "@/lib/confetti";
+import { playPop, playBigWin, playEpicWin, playCascade } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
 import DropReveal from "@/components/DropReveal";
 
-const progressMessages = [
-  "", // 0
-  "Great start!",
-  "We're getting somewhere...",
-  "Halfway there!",
-  "One more to go!",
-  "You crushed it this week!",
-];
+const progressMessages: Record<number, string> = {
+  1: "Great start!",
+  2: "We're getting somewhere...",
+  3: "Halfway there!",
+  4: "One more to go!",
+  5: "🔥 Halfway done!",
+  6: "Keep pushing!",
+  7: "Almost there...",
+  8: "So close!",
+  9: "One more to go!",
+  10: "🏆 LEGEND!",
+};
 
 export default function Challenges() {
   const navigate = useNavigate();
@@ -54,14 +58,16 @@ export default function Challenges() {
       if (!challenge.completed) {
         const newCount = getCompletedCount(next);
         if (navigator.vibrate) navigator.vibrate(50);
-        if (newCount === 5) {
+        if (newCount === 10) {
+          fireEpicConfetti();
+          playEpicWin();
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+        } else if (newCount === 5) {
           fireBigConfetti();
           playBigWin();
-          toast({ title: "🏆 All 5 done!", description: "You crushed it this week!" });
         } else {
           fireConfetti();
           playPop();
-          toast({ title: "✅ Challenge completed!", description: challenge.title });
         }
       }
 
@@ -134,10 +140,10 @@ export default function Challenges() {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">Progress</span>
             <span className="text-sm font-semibold text-primary">
-              {completed}/5 {completed > 0 && completed <= 5 ? progressMessages[completed] : ""}
+              {completed}/{completed <= 5 ? 5 : 10} {progressMessages[completed] || ""}
             </span>
           </div>
-          <Progress value={(Math.min(completed, 5) / 5) * 100} className="h-2 bg-muted" />
+          <Progress value={(completed / 10) * 100} className="h-2 bg-muted" />
         </div>
 
         {/* Challenge List — unified pill container */}
