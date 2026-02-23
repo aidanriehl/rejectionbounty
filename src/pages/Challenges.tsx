@@ -42,25 +42,27 @@ export default function Challenges() {
     setTimeout(() => setJustRevealed(false), 1500);
   };
 
-  const completeChallenge = (id: string) => {
+  const toggleChallenge = (id: string) => {
     setChallenges((prev) => {
       const challenge = prev.find((c) => c.id === id);
-      if (!challenge || challenge.completed) return prev;
+      if (!challenge) return prev;
 
       const next = prev.map((c) =>
-        c.id === id ? { ...c, completed: true } : c
+        c.id === id ? { ...c, completed: !c.completed } : c
       );
-      const newCount = getCompletedCount(next);
 
-      if (navigator.vibrate) navigator.vibrate(50);
-      if (newCount === 5) {
-        fireBigConfetti();
-        playBigWin();
-        toast({ title: "🏆 All 5 done!", description: "You crushed it this week!" });
-      } else {
-        fireConfetti();
-        playPop();
-        toast({ title: "✅ Challenge completed!", description: challenge.title });
+      if (!challenge.completed) {
+        const newCount = getCompletedCount(next);
+        if (navigator.vibrate) navigator.vibrate(50);
+        if (newCount === 5) {
+          fireBigConfetti();
+          playBigWin();
+          toast({ title: "🏆 All 5 done!", description: "You crushed it this week!" });
+        } else {
+          fireConfetti();
+          playPop();
+          toast({ title: "✅ Challenge completed!", description: challenge.title });
+        }
       }
 
       return next;
@@ -158,7 +160,7 @@ export default function Challenges() {
               >
                 {/* Number — tap to toggle complete */}
                 <button
-                  onClick={() => completeChallenge(challenge.id)}
+                  onClick={() => toggleChallenge(challenge.id)}
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
                     challenge.completed
@@ -261,7 +263,7 @@ export default function Challenges() {
             challengeTitle={cameraChallenge.title}
             onClose={() => setCameraChallenge(null)}
             onRecorded={(file) => {
-              completeChallenge(cameraChallenge.id);
+              toggleChallenge(cameraChallenge.id);
               setCameraChallenge(null);
               toast({ title: "Video recorded!", description: "Uploading your challenge video..." });
               navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
