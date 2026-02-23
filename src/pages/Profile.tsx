@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Settings, Grid3X3 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { mockUserProfile, mockUserVideos, avatarLabels } from "@/lib/mock-data";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 export default function Profile() {
   const [profile] = useState(mockUserProfile);
@@ -22,36 +24,37 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Profile header — avatar left, stats right (IG style) */}
-        <div className="mb-4 flex items-center gap-5">
-          {/* Avatar */}
-          <div className="flex flex-col items-center">
-            <AvatarDisplay avatar={profile.avatar} stage={profile.avatarStage} size="lg" />
-            <p className="mt-1 text-[10px] text-muted-foreground">{avatarLabels[profile.avatarStage]}</p>
-          </div>
-
-          {/* Stats */}
-          <div className="flex flex-1 justify-around">
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{profile.totalCompleted}</p>
-              <p className="text-[11px] text-muted-foreground">Challenges</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{profile.streak}</p>
-              <p className="text-[11px] text-muted-foreground">Streak</p>
-            </div>
-            <button onClick={() => navigate("/friends")} className="text-center">
-              <p className="text-lg font-bold text-foreground">{profile.friends}</p>
-              <p className="text-[11px] text-muted-foreground">Friends</p>
-            </button>
-          </div>
+        {/* Avatar — centered */}
+        <div className="mb-5 flex flex-col items-center">
+          <AvatarDisplay avatar={profile.avatar} stage={profile.avatarStage} size="lg" />
+          <p className="mt-1 text-[10px] text-muted-foreground">{avatarLabels[profile.avatarStage]}</p>
         </div>
 
-        {/* Name + bio area */}
-        <div className="mb-4">
-          <p className="text-sm font-semibold text-foreground">{profile.username}</p>
-          <p className="text-xs text-muted-foreground">Member since {profile.memberSince}</p>
-        </div>
+        {/* Streak Card */}
+        <Card className="mb-3">
+          <CardContent className="p-4">
+            <div className="mb-2 flex items-baseline justify-between">
+              <div>
+                <span className="text-2xl font-bold text-foreground">{profile.streak} 🔥</span>
+                <p className="text-xs text-muted-foreground">Day Streak</p>
+              </div>
+              <p className="text-xs text-muted-foreground">Best: {profile.bestStreak} days</p>
+            </div>
+            <Progress value={(profile.streak / 7) * 100} className="h-2" />
+            <p className="mt-1 text-[10px] text-muted-foreground text-right">{profile.streak}/7 this week</p>
+          </CardContent>
+        </Card>
+
+        {/* Challenges Card */}
+        <Card className="mb-5">
+          <CardContent className="p-4">
+            <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
+            <p className="text-xs text-muted-foreground">Challenges Completed</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% completion rate
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Grid tab */}
         <div className="mb-0.5 flex border-b">

@@ -17,6 +17,8 @@ export interface UserProfile {
   streak: number;
   totalCompleted: number;
   friends: number;
+  bestStreak: number;
+  totalAttempted: number;
   isPublic: boolean;
   memberSince: string;
 }
@@ -79,6 +81,8 @@ export const mockUserProfile: UserProfile = {
   streak: 4,
   totalCompleted: 47,
   friends: 12,
+  bestStreak: 12,
+  totalAttempted: 60,
   isPublic: true,
   memberSince: "Jan 2026",
 };
