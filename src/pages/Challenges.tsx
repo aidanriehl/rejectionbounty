@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clock, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
+import { Check, Clock, Crown, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, getCurrentWeekKey, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
 import WeeklySummary from "@/components/WeeklySummary";
 import DropReveal from "@/components/DropReveal";
+import PremiumGate from "@/components/PremiumGate";
 
 const progressMessages: Record<number, string> = {
   1: "Great start!",
@@ -34,6 +35,10 @@ export default function Challenges() {
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
+  const [showPremiumGate, setShowPremiumGate] = useState(false);
+
+  // TODO: Replace with real subscription check from Apple IAP
+  const isPremium = false;
   const completed = getCompletedCount(challenges);
   const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
@@ -95,50 +100,82 @@ export default function Challenges() {
         </div>
 
         {/* Subscriber Card */}
-        <div
-          className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                <Users className="h-5 w-5" />
+        {isPremium ? (
+          <div className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium opacity-60">Subscribers</p>
+                  <p className="text-2xl font-bold">{subscribers.toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-medium opacity-60">Subscribers</p>
-                <p className="text-2xl font-bold">{subscribers.toLocaleString()}</p>
+              <div className="text-right">
+                <p className="text-xs opacity-60 leading-tight">Monthly pool increases</p>
+                <p className="text-xs opacity-60 leading-tight">per subscriber</p>
+                <p className="text-lg font-bold">+$3.12</p>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs opacity-60 leading-tight">Monthly pool increases</p>
-              <p className="text-xs opacity-60 leading-tight">per subscriber</p>
-              <p className="text-lg font-bold">+$3.12</p>
             </div>
           </div>
-        </div>
+        ) : (
+          <button
+            onClick={() => setShowPremiumGate(true)}
+            className="mb-3 w-full overflow-hidden rounded-xl bg-foreground/5 border border-dashed border-muted-foreground/20 p-4 text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Subscriber Count</p>
+                <p className="text-xs text-muted-foreground">Subscribe to unlock</p>
+              </div>
+              <Crown className="ml-auto h-4 w-4 text-primary" />
+            </div>
+          </button>
+        )}
 
         {/* Prize Pool Card */}
-        <div
-          className="mb-5 overflow-hidden rounded-xl bg-foreground p-4 text-background"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                <Trophy className="h-5 w-5" />
+        {isPremium ? (
+          <div className="mb-5 overflow-hidden rounded-xl bg-foreground p-4 text-background">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
+                  <Trophy className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
+                  <p className="text-2xl font-bold">${prizePool.toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
-                <p className="text-2xl font-bold">${prizePool.toLocaleString()}</p>
+              <div className="text-right">
+                <div className="flex items-center gap-1 text-xs opacity-60">
+                  <Clock className="h-3 w-3" />
+                  <span>Resets in</span>
+                </div>
+                <p className="text-lg font-bold">{days}d {hours}h</p>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-xs opacity-60">
-                <Clock className="h-3 w-3" />
-                <span>Resets in</span>
-              </div>
-              <p className="text-lg font-bold">{days}d {hours}h</p>
             </div>
           </div>
-        </div>
+        ) : (
+          <button
+            onClick={() => setShowPremiumGate(true)}
+            className="mb-5 w-full overflow-hidden rounded-xl bg-foreground/5 border border-dashed border-muted-foreground/20 p-4 text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Trophy className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Weekly Prize Pool</p>
+                <p className="text-xs text-muted-foreground">Subscribe to unlock</p>
+              </div>
+              <Crown className="ml-auto h-4 w-4 text-primary" />
+            </div>
+          </button>
+        )}
 
         {/* Progress */}
         <div className="mb-5">
@@ -193,10 +230,10 @@ export default function Challenges() {
 
                 {/* Upload button — always visible */}
                 <button
-                  onClick={() => setChoiceChallenge(challenge)}
+                  onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
                   className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                 >
-                  <Upload className="h-3 w-3" />
+                  {isPremium ? <Upload className="h-3 w-3" /> : <Crown className="h-3 w-3" />}
                 </button>
               </motion.div>
             ))}
@@ -283,6 +320,17 @@ export default function Challenges() {
           />
         )}
       </AnimatePresence>
+
+      {/* Premium gate modal */}
+      <PremiumGate
+        open={showPremiumGate}
+        onClose={() => setShowPremiumGate(false)}
+        onSubscribe={() => {
+          setShowPremiumGate(false);
+          // TODO: Trigger Apple IAP here
+          toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
+        }}
+      />
     </div>
     </>
   );
