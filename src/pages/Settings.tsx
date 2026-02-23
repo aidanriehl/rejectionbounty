@@ -178,7 +178,7 @@ export default function SettingsPage() {
                   {profile.isPublic ? "Public Profile" : "Private Profile"}
                 </span>
                 <p className="text-xs text-muted-foreground">
-                  {profile.isPublic ? "Anyone can see your videos" : "Only friends can see your videos"}
+                  {profile.isPublic ? "Anyone can see your profile" : "Only friends can see your profile"}
                 </p>
               </div>
             </div>
