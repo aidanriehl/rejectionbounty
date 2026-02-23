@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, getCurrentWeekKey, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
-import { playPop, playBigWin } from "@/lib/sounds";
+import { playPop, playBigWin, playCascade } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
 import DropReveal from "@/components/DropReveal";
@@ -24,6 +24,7 @@ export default function Challenges() {
   const navigate = useNavigate();
   const weekKey = getCurrentWeekKey();
   const [dropRevealed, setDropRevealed] = useState(() => localStorage.getItem(weekKey) === "true");
+  const [justRevealed, setJustRevealed] = useState(false);
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
@@ -35,6 +36,10 @@ export default function Challenges() {
   const handleRevealComplete = () => {
     localStorage.setItem(weekKey, "true");
     setDropRevealed(true);
+    setJustRevealed(true);
+    playCascade(10, 900);
+    // Reset after animation completes
+    setTimeout(() => setJustRevealed(false), 1500);
   };
 
   const completeChallenge = (id: string) => {
@@ -141,9 +146,12 @@ export default function Challenges() {
             {challenges.map((challenge, i) => (
               <motion.div
                 key={challenge.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.03 }}
+                initial={justRevealed ? { opacity: 0, y: -30, scale: 0.9 } : { opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                transition={justRevealed
+                  ? { delay: i * 0.09, type: "spring", stiffness: 400, damping: 20 }
+                  : { delay: i * 0.03 }
+                }
                 className={cn(
                   "group flex items-center gap-3 px-4 py-3 transition-all",
                   i !== challenges.length - 1 && "border-b",
