@@ -65,7 +65,7 @@ function ReelCard({ post }: { post: FeedPost }) {
         )}
       </AnimatePresence>
 
-      <div className="absolute right-3 bottom-28 flex flex-col items-center gap-5">
+      <div className="absolute right-3 bottom-16 flex flex-col items-center gap-1">
         <button
           onClick={(e) => { e.stopPropagation(); toggleLike(); }}
           className="flex flex-col items-center gap-1 transition-transform active:scale-90"
