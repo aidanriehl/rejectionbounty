@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clock, Trophy, Upload, Users } from "lucide-react";
+import { Check, Clock, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
 import { playPop, playBigWin } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
+import CameraRecorder from "@/components/CameraRecorder";
 
 const progressMessages = [
   "", // 0
@@ -21,6 +22,8 @@ const progressMessages = [
 export default function Challenges() {
   const navigate = useNavigate();
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
+  const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
+  const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
   const completed = getCompletedCount(challenges);
   const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
@@ -172,7 +175,7 @@ export default function Challenges() {
                 {/* Upload indicator */}
                 {challenge.completed && (
                   <button
-                    onClick={() => navigate("/post", { state: { challengeTitle: challenge.title } })}
+                    onClick={() => setChoiceChallenge(challenge)}
                     className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                   >
                     <Upload className="h-3 w-3" />
@@ -184,6 +187,85 @@ export default function Challenges() {
         </div>
       </div>
 
+      {/* Choice modal: Record or Upload */}
+      <AnimatePresence>
+        {choiceChallenge && !cameraChallenge && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setChoiceChallenge(null)}
+          >
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-lg rounded-t-2xl bg-card p-5 pb-8"
+            >
+              <p className="mb-1 text-lg font-bold text-foreground">Add Video</p>
+              <p className="mb-5 text-sm text-muted-foreground">{choiceChallenge.title}</p>
+
+              <button
+                onClick={() => {
+                  setCameraChallenge(choiceChallenge);
+                  setChoiceChallenge(null);
+                }}
+                className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <Video className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Record Now</p>
+                  <p className="text-xs text-muted-foreground">Film directly in the app</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setChoiceChallenge(null);
+                  navigate("/post", { state: { challengeTitle: choiceChallenge.title } });
+                }}
+                className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <FolderOpen className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Upload from Library</p>
+                  <p className="text-xs text-muted-foreground">Choose a video from your camera roll</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setChoiceChallenge(null)}
+                className="mt-1 w-full py-2 text-sm text-muted-foreground"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-screen camera recorder */}
+      <AnimatePresence>
+        {cameraChallenge && (
+          <CameraRecorder
+            challengeTitle={cameraChallenge.title}
+            onClose={() => setCameraChallenge(null)}
+            onRecorded={(file) => {
+              setCameraChallenge(null);
+              toast({ title: "Video recorded!", description: "Uploading your challenge video..." });
+              // Navigate to post page with the recorded file
+              navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
