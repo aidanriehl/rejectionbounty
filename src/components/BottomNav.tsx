@@ -13,7 +13,10 @@ export default function BottomNav() {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg",
+      location.pathname !== "/" && "border-t border-border"
+    )}>
       <div className="mx-auto flex max-w-lg items-center justify-around py-3">
         {tabs.map((tab) => {
           const active = location.pathname === tab.path;
