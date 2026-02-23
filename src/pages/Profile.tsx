@@ -61,7 +61,7 @@ export default function Profile() {
         <Card className="mb-3">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <p className="flex items-baseline gap-1.5">
+              <p className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-foreground">🔥 {profile.streak}</span>
                 <span className="text-lg font-bold text-foreground">Day Streak</span>
               </p>
@@ -78,7 +78,7 @@ export default function Profile() {
             <Card className="mb-5">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <p className="flex items-baseline gap-1.5">
+                  <p className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
                     <span className="text-lg font-bold text-foreground">Challenges Completed</span>
                   </p>
