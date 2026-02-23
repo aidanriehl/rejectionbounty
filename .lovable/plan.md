@@ -1,66 +1,92 @@
 
-# Onboarding Page with Google + Apple Sign-In
+
+# Weekly Challenge Backlog System
 
 ## Overview
-Create a single-page onboarding screen with Google and Apple sign-in buttons. After signing in, users see a quick username input before entering the app. An avatar creature is auto-assigned randomly.
+Create a database-driven challenge system where you pre-load many weeks of challenges at once. Each Sunday, the next batch of 10 automatically becomes the active set. You'll manage this through a simple admin page in the app (only visible to you).
 
-This requires connecting a backend (Lovable Cloud) for authentication.
+## How It Works
 
-## Flow
+1. You load challenges into the database, each tagged with a `week_number` (1, 2, 3, etc.)
+2. A `challenge_weeks` table tracks which week is currently active and when it started
+3. Every Sunday, a scheduled backend function advances to the next week automatically
+4. Users see only the current week's 10 challenges
 
-1. **Onboarding screen** (`/onboarding`) -- the landing page for unauthenticated users
-   - App logo/name and tagline (e.g. "Face your fears. One challenge at a time.")
-   - "Sign in with Google" button
-   - "Sign in with Apple" button
-   - Clean, minimal design matching the app's style
+## Database Changes
 
-2. **Username setup** (`/setup`) -- shown once after first sign-in
-   - Simple input: "Pick a username"
-   - Auto-assigns a random avatar creature (dragon, tree, fox, owl, cat)
-   - "Let's go" button to confirm and enter the app
+### New tables
 
-3. **Auth guard** -- redirects unauthenticated users to `/onboarding`, and authenticated users without a username to `/setup`
-
-## Backend Requirements
-
-Before implementing, we need to **connect Lovable Cloud** to your project. This gives you:
-- Supabase auth with Google + Apple sign-in (managed for you)
-- A database for storing user profiles (username, avatar, streak, etc.)
-
-### Database
-
-A `profiles` table will be created:
-- `id` (UUID, references auth.users)
-- `username` (text, unique)
-- `avatar` (text -- dragon/tree/fox/owl/cat)
-- `avatar_stage` (integer, default 0)
-- `streak` (integer, default 0)
-- `total_completed` (integer, default 0)
+**`challenges`** -- stores all challenges across all weeks
+- `id` (UUID, primary key)
+- `week_number` (integer) -- which week batch this belongs to
+- `position` (integer, 1-10) -- order within the week
+- `title` (text)
+- `description` (text)
+- `emoji` (text)
 - `created_at` (timestamp)
 
-A trigger will auto-create a profile row when a user signs up.
+**`challenge_weeks`** -- tracks current active week
+- `id` (integer, always 1 -- single row)
+- `current_week` (integer, default 1)
+- `week_started_at` (timestamp)
+
+**`user_challenges`** -- tracks each user's completions
+- `id` (UUID, primary key)
+- `user_id` (UUID, references auth.users)
+- `challenge_id` (UUID, references challenges)
+- `completed_at` (timestamp)
+
+**`user_roles`** -- admin role (required for security)
+- `id` (UUID)
+- `user_id` (UUID, references auth.users)
+- `role` (enum: admin, user)
 
 ### RLS Policies
-- Users can read any profile (for the feed)
-- Users can only update their own profile
+- `challenges`: everyone can read; only admins can insert/update/delete
+- `challenge_weeks`: everyone can read; only admins can update
+- `user_challenges`: users can read/insert their own completions
+- `user_roles`: only the `has_role()` security definer function accesses this
+
+### Scheduled function (cron)
+- A backend function runs every Sunday at midnight
+- It increments `current_week` in `challenge_weeks` and resets the week timer
+- Uses `pg_cron` + `pg_net` to call an edge function on schedule
+
+## App Changes
+
+### Admin page (`/admin`)
+- Only accessible if your user has the `admin` role
+- Simple form to bulk-add challenges: pick a week number, then enter 10 challenge titles + emojis
+- View upcoming weeks and edit/reorder challenges
+- Button to manually advance the week (for testing)
+
+### Challenges page update
+- Fetch current week's challenges from the database instead of mock data
+- Track completions in `user_challenges` table instead of local state
+- Keep the existing UI (progress bar, confetti, upload button)
+
+### Route guard
+- Add `/admin` route, only rendered when user has admin role
 
 ## File Changes
 
 ### New files
-- `src/lib/supabase.ts` -- Supabase client setup
-- `src/pages/Onboarding.tsx` -- Sign-in screen with Google/Apple buttons
-- `src/pages/Setup.tsx` -- Username picker (post-signup)
-- `src/hooks/useAuth.ts` -- Auth state hook (current user, loading, profile)
+- `supabase/functions/advance-week/index.ts` -- edge function to advance the week
+- `src/pages/Admin.tsx` -- admin page for managing challenge backlog
+- `src/hooks/useAdmin.ts` -- hook to check admin role
 
 ### Modified files
-- `src/App.tsx` -- Add routes for `/onboarding` and `/setup`, wrap with auth context, redirect logic
-- `src/lib/mock-data.ts` -- Keep mock data for now but the profile will eventually come from the database
+- `src/pages/Challenges.tsx` -- fetch from database instead of mock data
+- `src/App.tsx` -- add `/admin` route with role guard
 
 ## Step-by-step
 
-1. Connect Lovable Cloud to the project
-2. Create the `profiles` table with trigger and RLS
-3. Build the Supabase client and auth hook
-4. Build the Onboarding page (Google + Apple buttons, app branding)
-5. Build the Setup page (username input, random avatar assignment)
-6. Update App.tsx routing to guard pages behind auth
+1. Create database tables (`challenges`, `challenge_weeks`, `user_challenges`, `user_roles`) with RLS
+2. Create `has_role()` security definer function
+3. Assign your user the admin role
+4. Build the `advance-week` edge function
+5. Set up the Sunday cron job
+6. Build the admin page for loading challenges
+7. Update the Challenges page to read from the database
+8. Add admin route to App.tsx
+
