@@ -1,50 +1,43 @@
 
 
-# Feed Redesign: Reels-Style Grid + Full-Screen Viewer
+# Profile Page Redesign
 
-## What Changes
+## What's Changing
 
-The feed switches from full-width stacked cards to a **3-column grid of 9:16 thumbnails** (like Instagram's Reels tab). Tapping any thumbnail opens a **full-screen vertical viewer** with post details, like button, and double-tap-to-like.
+Remove the Instagram-style stats row and "Member since" text. Replace with two stacked full-width cards below the avatar and username.
 
-## Layout
+## New Layout (top to bottom)
 
-### Grid View (Feed page)
-- 3-column grid with small gaps (2px like Instagram)
-- Each cell is 9:16 aspect ratio
-- Thumbnails fill the cell, no borders or rounded corners
-- Rank badges (for All Time tab) overlay top-left of each thumbnail
-- Like count overlaid at bottom-left with a small heart icon
-- Username overlaid at bottom of thumbnail in small text
-- Tabs (This Week / All Time / Friends) remain at the top
+1. **Top bar** -- username left, settings gear right (stays the same)
+2. **Avatar** -- centered, with stage label below (stays the same)
+3. **Streak Card** -- full-width card containing:
+   - Current streak number with fire emoji (e.g. "4 🔥")
+   - Label: "Day Streak"
+   - Progress bar showing progress toward a 7-day weekly goal
+   - Best streak displayed as secondary text (e.g. "Best: 12 days")
+4. **Challenges Card** -- full-width card containing:
+   - Total completed count (e.g. "47")
+   - Label: "Challenges Completed"
+   - Completion rate as secondary text (e.g. "78% completion rate")
+5. **Video Grid** -- the 3x3 grid stays as-is below the cards
 
-### Full-Screen Viewer (opens on tap)
-- Opens as a full-screen overlay/modal
-- Shows the video/thumbnail at 9:16 filling the screen
-- Right side: vertical action bar (heart, like count) like Reels
-- Bottom: username, avatar, challenge title overlaid on the video
-- Double-tap anywhere to like (with heart animation)
-- Swipe up/down or tap X to close
-- Could later support vertical swiping between posts
+## What's Removed
+
+- The side-by-side stats row (Challenges / Streak / Friends)
+- The "DailyRejecter" name repetition and "Member since Jan 2026" text below the stats
+- Friends count entirely
 
 ## Technical Details
 
-### Files to modify
+### File: `src/pages/Profile.tsx`
+- Remove the stats row (`flex flex-1 justify-around` block with Challenges/Streak/Friends)
+- Remove the name + bio section ("Member since" text)
+- Add a `bestStreak` field usage from mock data (will add to mock data)
+- Add two stacked Card components using the existing `Card` UI component
+- First card: streak number, fire emoji, 7-day progress bar (using the existing `Progress` component), best streak text
+- Second card: total completed, "Challenges Completed" label, completion rate text
 
-**`src/pages/Feed.tsx`**
-- Replace `PostCard` with a `GridThumbnail` component: just the image in 9:16 with overlaid like count and username
-- Wrap each tab's content in a `grid grid-cols-3 gap-0.5` layout
-- Add state to track which post is selected for the full-screen viewer
-- On thumbnail tap, open the full-screen viewer
+### File: `src/lib/mock-data.ts`
+- Add `bestStreak` field to `UserProfile` interface and mock data (e.g. 12)
+- Add `totalAttempted` field to calculate completion rate (e.g. 60, giving 78%)
 
-**New component: `src/components/ReelViewer.tsx`**
-- Full-screen overlay (fixed inset-0, z-50, bg-black)
-- Shows the selected post's thumbnail/video at full size
-- Right-side action column: heart button + like count
-- Bottom overlay: avatar, username, challenge title
-- Double-tap-to-like with the existing heart animation
-- Close button (X) top-right or swipe down to dismiss
-- Receives the post data + onClose + onLike callbacks
-
-### No new dependencies needed
-- framer-motion already handles animations
-- All existing like logic transfers to the viewer component
