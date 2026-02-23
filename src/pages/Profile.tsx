@@ -119,7 +119,7 @@ export default function Profile() {
                     {ms.medal && (
                       <span className="flex items-center"><MedalIcon tier={ms.medal.tier} size={28} /></span>
                     )}
-                    <span className="text-2xl font-bold text-foreground leading-none">{totalCompleted}</span>
+                    <span className="text-2xl font-bold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
                     <span className="text-lg font-bold text-foreground leading-none">Challenges Completed</span>
                   </p>
                 </div>
