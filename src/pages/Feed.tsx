@@ -96,11 +96,11 @@ function ReelCard({ post }: { post: FeedPost }) {
   );
 }
 
-function FeedPane({ posts }: { posts: FeedPost[] }) {
+function FeedPane({ posts, emptyMessage }: { posts: FeedPost[]; emptyMessage: string }) {
   if (posts.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-white/60">Add friends to see their videos here</p>
+        <p className="text-sm text-white/60">{emptyMessage}</p>
       </div>
     );
   }
@@ -176,7 +176,14 @@ export default function Feed() {
       >
         {panes.map((posts, i) => (
           <div key={TABS[i].key} className="h-full w-full flex-shrink-0">
-            <FeedPane posts={posts} />
+            <FeedPane
+              posts={posts}
+              emptyMessage={
+                i === 0 ? "No videos submitted yet" :
+                i === 1 ? "Add friends to see their videos here" :
+                "No videos submitted yet"
+              }
+            />
           </div>
         ))}
       </motion.div>
