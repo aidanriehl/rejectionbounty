@@ -154,15 +154,18 @@ export default function Challenges() {
                   challenge.completed && "bg-success/5"
                 )}
               >
-                {/* Number */}
-                <span className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                  challenge.completed
-                    ? "bg-success text-success-foreground"
-                    : "bg-muted text-muted-foreground"
-                )}>
+                {/* Number — tap to toggle complete */}
+                <button
+                  onClick={() => completeChallenge(challenge.id)}
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    challenge.completed
+                      ? "bg-success text-success-foreground"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
                   {challenge.completed ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
-                </span>
+                </button>
 
                 {/* Title only */}
                 <span className={cn(
