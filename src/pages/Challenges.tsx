@@ -29,37 +29,26 @@ export default function Challenges() {
   const prizePool = 1247;
   const subscribers = 1832;
 
-  const toggleChallenge = (id: string) => {
+  const completeChallenge = (id: string) => {
     setChallenges((prev) => {
       const challenge = prev.find((c) => c.id === id);
-      if (!challenge) return prev;
+      if (!challenge || challenge.completed) return prev;
 
-      // If not completed yet, complete it and open upload modal
-      if (!challenge.completed) {
-        const next = prev.map((c) =>
-          c.id === id ? { ...c, completed: true } : c
-        );
-        const newCount = getCompletedCount(next);
+      const next = prev.map((c) =>
+        c.id === id ? { ...c, completed: true } : c
+      );
+      const newCount = getCompletedCount(next);
 
-        // Haptic
-        if (navigator.vibrate) navigator.vibrate(50);
-        // Confetti + sound
-        if (newCount === 5) {
-          fireBigConfetti();
-          playBigWin();
-        } else {
-          fireConfetti();
-          playPop();
-        }
-
-
-        return next;
+      if (navigator.vibrate) navigator.vibrate(50);
+      if (newCount === 5) {
+        fireBigConfetti();
+        playBigWin();
+      } else {
+        fireConfetti();
+        playPop();
       }
 
-      // If already completed, uncomplete
-      return prev.map((c) =>
-        c.id === id ? { ...c, completed: false } : c
-      );
+      return next;
     });
   };
 
@@ -160,27 +149,20 @@ export default function Challenges() {
                 </span>
 
                 {/* Title only */}
-                <button
-                  onClick={() => toggleChallenge(challenge.id)}
-                  className="flex-1 text-left"
-                >
-                  <span className={cn(
-                    "text-sm font-medium text-foreground",
-                    challenge.completed && "line-through opacity-50"
-                  )}>
-                    {challenge.title} {challenge.emoji}
-                  </span>
-                </button>
+                <span className={cn(
+                  "flex-1 text-left text-sm font-medium text-foreground",
+                  challenge.completed && "line-through opacity-50"
+                )}>
+                  {challenge.title} {challenge.emoji}
+                </span>
 
-                {/* Upload indicator */}
-                {challenge.completed && (
-                  <button
-                    onClick={() => setChoiceChallenge(challenge)}
-                    className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
-                  >
-                    <Upload className="h-3 w-3" />
-                  </button>
-                )}
+                {/* Upload button — always visible */}
+                <button
+                  onClick={() => setChoiceChallenge(challenge)}
+                  className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
+                >
+                  <Upload className="h-3 w-3" />
+                </button>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -258,9 +240,9 @@ export default function Challenges() {
             challengeTitle={cameraChallenge.title}
             onClose={() => setCameraChallenge(null)}
             onRecorded={(file) => {
+              completeChallenge(cameraChallenge.id);
               setCameraChallenge(null);
               toast({ title: "Video recorded!", description: "Uploading your challenge video..." });
-              // Navigate to post page with the recorded file
               navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
             }}
           />
