@@ -65,7 +65,7 @@ function ReelCard({ post }: { post: FeedPost }) {
         )}
       </AnimatePresence>
 
-      <div className="absolute right-3 bottom-16 flex flex-col items-center gap-4">
+      <div className="absolute right-3 bottom-24 flex flex-col items-center gap-4">
         {/* Profile avatar */}
         <div className="relative">
           <AvatarDisplay avatar={post.avatar} stage={post.avatarStage} size="sm" />
@@ -93,16 +93,17 @@ function ReelCard({ post }: { post: FeedPost }) {
 
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
-      <div className="absolute bottom-4 left-4 right-16">
-        <div className="flex items-center gap-2.5 mb-1.5">
-          <AvatarDisplay
-            avatar={post.avatar}
-            stage={post.avatarStage}
-            size="sm"
-            showAddFriend={!post.isFriend}
-            onAddFriend={() => {}}
-          />
+      <div className="absolute bottom-6 left-4 right-16">
+        <div className="flex items-center gap-2.5 mb-1">
           <span className="text-sm font-semibold text-white drop-shadow-md">{post.username}</span>
+          {!post.isFriend && (
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="px-2.5 py-0.5 rounded text-[11px] font-semibold border border-white/60 text-white drop-shadow-md active:scale-95 transition-transform"
+            >
+              Follow
+            </button>
+          )}
         </div>
         <p className="text-xs text-white/80 drop-shadow-md">{post.challengeTitle}</p>
       </div>
