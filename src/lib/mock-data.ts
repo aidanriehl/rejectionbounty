@@ -66,13 +66,7 @@ export const mockChallenges: Challenge[] = [
   { id: "10", title: "Ask for a free coffee", description: "Walk into a coffee shop and ask if they can give you one for free", emoji: "☕", completed: true, hasVideo: false },
 ];
 
-export const mockFeedPosts: FeedPost[] = [
-  { id: "1", username: "brave_sarah", avatar: "dragon", avatarStage: 3, challengeTitle: "Sing in public for 10 seconds", thumbnailUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop", videoUrl: "", likes: 234, liked: true, createdAt: "2h ago", daysAgo: 0, isFriend: true },
-  { id: "2", username: "rejection_king", avatar: "fox", avatarStage: 2, challengeTitle: "Ask for a free coffee", thumbnailUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop", videoUrl: "", likes: 189, liked: false, createdAt: "4h ago", daysAgo: 0, isFriend: false },
-  { id: "3", username: "fearless_mike", avatar: "owl", avatarStage: 1, challengeTitle: "Dance in an elevator", thumbnailUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=400&h=300&fit=crop", videoUrl: "", likes: 156, liked: false, createdAt: "6h ago", daysAgo: 1, isFriend: true },
-  { id: "4", username: "courage_queen", avatar: "cat", avatarStage: 3, challengeTitle: "Request a discount at a store", thumbnailUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop", videoUrl: "", likes: 134, liked: true, createdAt: "1d ago", daysAgo: 2, isFriend: false },
-  { id: "5", username: "no_fear_nina", avatar: "tree", avatarStage: 0, challengeTitle: "Ask a stranger for a high-five", thumbnailUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop", videoUrl: "", likes: 98, liked: false, createdAt: "3d ago", daysAgo: 3, isFriend: true },
-];
+export const mockFeedPosts: FeedPost[] = [];
 
 export const mockUserProfile: UserProfile = {
   username: "DailyRejecter",
@@ -87,14 +81,6 @@ export const mockUserProfile: UserProfile = {
   memberSince: "Jan 2026",
 };
 
-export const mockUserVideos = [
-  "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200&h=200&fit=crop",
-];
 
 export const getCompletedCount = (challenges: Challenge[]) =>
   challenges.filter((c) => c.completed).length;
