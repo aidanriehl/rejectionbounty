@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.get-video]
 verify_jwt = false
+
+[functions.create-connect-account]
+verify_jwt = false
+
+[functions.check-connect-status]
+verify_jwt = false
+
+[functions.process-weekly-payouts]
+verify_jwt = false
