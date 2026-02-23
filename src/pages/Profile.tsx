@@ -104,14 +104,14 @@ export default function Profile() {
           return (
             <Card className="mb-5">
               <CardContent className="p-4">
-                <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-2">
                   <p className="flex items-baseline gap-2">
+                    {ms.medal && (
+                      <span className="relative top-0.5"><MedalIcon tier={ms.medal.tier} size={28} /></span>
+                    )}
                     <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
                     <span className="text-lg font-bold text-foreground">Challenges Completed</span>
                   </p>
-                  {ms.medal && (
-                    <span className="relative -top-0.5"><MedalIcon tier={ms.medal.tier} size={34} /></span>
-                  )}
                 </div>
                 <div className="mt-2">
                   <Progress value={progressPct} className="h-2" />
