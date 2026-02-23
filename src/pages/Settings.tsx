@@ -7,10 +7,23 @@ import { mockUserProfile, type AvatarType } from "@/lib/mock-data";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { signOut } = useAuth();
   const [profile, setProfile] = useState(mockUserProfile);
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(profile.username);
@@ -302,14 +315,43 @@ export default function SettingsPage() {
 
         {/* Danger Zone */}
         <div className="mb-4 overflow-hidden rounded-xl border bg-card">
-          <button className="flex w-full items-center gap-3 border-b px-4 py-3 text-sm font-medium text-foreground">
+          <button
+            onClick={async () => {
+              await signOut();
+              navigate("/");
+            }}
+            className="flex w-full items-center gap-3 border-b px-4 py-3 text-sm font-medium text-foreground"
+          >
             <LogOut className="h-4 w-4 text-muted-foreground" />
             Log Out
           </button>
-          <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-destructive">
-            <Trash2 className="h-4 w-4" />
-            Delete Account
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-destructive">
+                <Trash2 className="h-4 w-4" />
+                Delete Account
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. Your account and all data will be permanently deleted.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={async () => {
+                    toast({ title: "Account deletion requested", description: "Please contact support to complete this process." });
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
