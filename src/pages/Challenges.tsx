@@ -45,7 +45,7 @@ export default function Challenges() {
     setJustRevealed(true);
     playCascade(10, 900);
     // Reset after animation completes
-    setTimeout(() => setJustRevealed(false), 1500);
+    setTimeout(() => setJustRevealed(false), 2500);
   };
 
   const toggleChallenge = (id: string) => {
@@ -157,10 +157,10 @@ export default function Challenges() {
             {challenges.map((challenge, i) => (
               <motion.div
                 key={challenge.id}
-                initial={justRevealed ? { opacity: 0, y: -30, scale: 0.9 } : false}
-                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                initial={justRevealed ? { opacity: 0, y: -200, scale: 0.6, rotate: -8 } : false}
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
                 transition={justRevealed
-                  ? { delay: i * 0.09, type: "spring", stiffness: 400, damping: 20 }
+                  ? { delay: i * 0.12, type: "spring", stiffness: 300, damping: 18 }
                   : { duration: 0 }
                 }
                 className={cn(
