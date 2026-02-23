@@ -327,7 +327,15 @@ export default function SettingsPage() {
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={async () => {
-                    toast({ title: "Account deletion requested", description: "Please contact support to complete this process." });
+                    try {
+                      const { error } = await supabase.functions.invoke("delete-account");
+                      if (error) throw error;
+                    } catch (e) {
+                      console.error("Failed to delete account:", e);
+                    }
+                    await signOut();
+                    navigate("/");
+                    toast({ title: "Account deleted" });
                   }}
                 >
                   Delete
