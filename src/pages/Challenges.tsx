@@ -187,7 +187,7 @@ export default function Challenges() {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-lg rounded-t-2xl bg-card p-5 pb-8"
             >
-              <p className="mb-1 text-lg font-bold text-foreground">Add Video</p>
+              <p className="mb-1 text-lg font-bold text-foreground">Add Accountability Vid</p>
               <p className="mb-5 text-sm text-muted-foreground">{choiceChallenge.title}</p>
 
               <button
