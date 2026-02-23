@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { mockChallenges, getCompletedCount, getTimeUntilSunday, type Challenge } from "@/lib/mock-data";
+import { mockChallenges, getCompletedCount, getTimeUntilSunday, getCurrentWeekKey, type Challenge } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti } from "@/lib/confetti";
 import { playPop, playBigWin } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
+import DropReveal from "@/components/DropReveal";
 
 const progressMessages = [
   "", // 0
@@ -21,6 +22,8 @@ const progressMessages = [
 
 export default function Challenges() {
   const navigate = useNavigate();
+  const weekKey = getCurrentWeekKey();
+  const [dropRevealed, setDropRevealed] = useState(() => localStorage.getItem(weekKey) === "true");
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
@@ -28,6 +31,11 @@ export default function Challenges() {
   const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
   const subscribers = 1832;
+
+  const handleRevealComplete = () => {
+    localStorage.setItem(weekKey, "true");
+    setDropRevealed(true);
+  };
 
   const completeChallenge = (id: string) => {
     setChallenges((prev) => {
@@ -54,6 +62,10 @@ export default function Challenges() {
 
 
   return (
+    <>
+      <AnimatePresence>
+        {!dropRevealed && <DropReveal onRevealComplete={handleRevealComplete} />}
+      </AnimatePresence>
     <div className="min-h-screen pb-24 pt-4">
       <div className="mx-auto max-w-lg px-4">
         {/* Header */}
@@ -249,5 +261,6 @@ export default function Challenges() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }
