@@ -65,16 +65,19 @@ function ReelCard({ post }: { post: FeedPost }) {
         )}
       </AnimatePresence>
 
-      <div className="absolute right-3 bottom-24 flex flex-col items-center gap-4">
-        {/* Profile avatar */}
-        <div className="relative">
+      <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5">
+        {/* Profile avatar with follow + */}
+        <button
+          onClick={(e) => e.stopPropagation()}
+          className="relative active:scale-95 transition-transform"
+        >
           <AvatarDisplay avatar={post.avatar} stage={post.avatarStage} size="sm" />
           {!post.isFriend && (
-            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-[10px] font-bold text-primary-foreground leading-none">+</span>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-5 w-5 rounded-full bg-destructive flex items-center justify-center border-2 border-black">
+              <span className="text-[11px] font-bold text-white leading-none">+</span>
             </div>
           )}
-        </div>
+        </button>
 
         {/* Like */}
         <button
