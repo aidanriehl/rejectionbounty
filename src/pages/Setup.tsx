@@ -48,7 +48,7 @@ export default function Setup({ userId, onComplete }: SetupProps) {
     }
 
     onComplete(data as Profile);
-    navigate("/");
+    navigate("/profile");
   };
 
   return (
