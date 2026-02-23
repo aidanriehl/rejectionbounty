@@ -147,28 +147,19 @@ export default function Feed() {
     <div className="relative h-[calc(100vh-5rem)] w-full overflow-hidden bg-black">
       {/* Tab bar overlay */}
       <div className="absolute top-0 inset-x-0 z-10 pt-3 px-4">
-        <div className="relative bg-black/30 backdrop-blur-sm rounded-lg p-1">
-          {/* Active indicator */}
-          <motion.div
-            className="absolute top-1 bottom-1 rounded-md bg-white/20"
-            style={{ width: `${100 / TABS.length}%` }}
-            animate={{ left: `${tabIndex * (100 / TABS.length)}%` }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          />
-          <div className="relative flex">
-            {TABS.map((tab, i) => (
-              <button
-                key={tab.key}
-                onClick={() => setTabIndex(i)}
-                className={cn(
-                  "flex-1 py-1.5 text-sm font-medium rounded-md transition-colors z-10",
-                  i === tabIndex ? "text-white" : "text-white/50"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center justify-center gap-4">
+          {TABS.map((tab, i) => (
+            <button
+              key={tab.key}
+              onClick={() => setTabIndex(i)}
+              className={cn(
+                "text-base font-bold transition-colors",
+                i === tabIndex ? "text-white" : "text-white/40"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
