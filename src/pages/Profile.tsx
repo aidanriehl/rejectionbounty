@@ -37,8 +37,8 @@ export default function Profile() {
           <CardContent className="p-4">
             <div className="mb-2 flex items-baseline justify-between">
               <div>
-                <span className="text-2xl font-bold text-foreground">{profile.streak} 🔥</span>
-                <p className="text-xs text-muted-foreground">Day Streak</p>
+                <span className="text-2xl font-bold text-foreground">{profile.streak} 🔥 </span>
+                <span className="text-xs text-muted-foreground">Day Streak</span>
               </div>
               <p className="text-xs text-muted-foreground">Best: {profile.bestStreak} days</p>
             </div>
@@ -50,8 +50,8 @@ export default function Profile() {
         {/* Challenges Card */}
         <Card className="mb-5">
           <CardContent className="p-4">
-            <span className="text-2xl font-bold text-foreground">{profile.totalCompleted}</span>
-            <p className="text-xs text-muted-foreground">Challenges Completed</p>
+            <span className="text-2xl font-bold text-foreground">{profile.totalCompleted} </span>
+            <span className="text-xs text-muted-foreground">Challenges Completed</span>
             <p className="mt-1 text-xs text-muted-foreground">
               {Math.round((profile.totalCompleted / profile.totalAttempted) * 100)}% completion rate
             </p>
