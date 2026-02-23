@@ -1,48 +1,35 @@
 
 
-## Weekly Drop Reveal Animation
+## Remove Placeholder Content from Profile
 
-A full-screen reveal experience that plays when users open the Challenges page and haven't "unwrapped" the current week's drop yet. Inspired by Claim's tap-to-reveal mechanic.
+### Problem
+The Profile page displays hardcoded mock data (`mockUserProfile`, `mockUserVideos`) instead of the real user's profile from the database. A brand new user sees "47 Challenges Completed", a "4 Day Streak", and stock photos — which is confusing and misleading.
 
-### The Experience
+### What Changes
 
-1. **Full-screen overlay** with a bold gradient background (deep purple to black, matching the app's primary color)
-2. **A bounty chest graphic** (fits the "Rejection Bounty" brand) built as an SVG -- a stylized treasure chest with a lock
-3. **3 taps to unlock:**
-   - **Tap 1**: Chest shakes, lock cracks, particles fly out. Text: "Keep going..."
-   - **Tap 2**: Chest lid lifts slightly, golden light leaks out, more particles. Text: "Almost there..."
-   - **Tap 3**: Chest bursts open, big confetti explosion, golden light fills screen, then transitions to reveal the challenge list with a staggered card-flip animation
-4. **Challenge reveal**: Each challenge card fades/scales in one-by-one with a short stagger delay
+**1. Use real profile data from the auth hook**
+- Replace `mockUserProfile` with the actual `profile` from `useAuth()`
+- Display the user's real username, avatar, avatar stage, streak, and total completed count
+- A new user will correctly see 0 streak, 0 challenges, and the proper starting avatar
 
-### Visual Details
+**2. Remove fake video grid for now**
+- Remove `mockUserVideos` stock photos from the grid
+- Show an empty state instead: a subtle message like "Complete challenges and post videos to fill your grid" with a camera icon
+- Once real video uploads exist in the database, this grid can be wired up later
 
-- The chest SVG will use the app's `primary` and `gold` color tokens
-- Each tap stage has a subtle scale bounce (framer-motion spring)
-- The "crack" and "light leak" effects are layered div glows with opacity transitions
-- Final reveal uses the existing `fireBigConfetti()` function
-- A pulsing "Tap to open" prompt below the chest guides the user
+**3. Handle zero/new-user states gracefully**
+- Streak card: show "0 Day Streak" with "Best: 0 days"
+- Challenges card: show "0 Challenges Completed" with progress bar at 0%
+- Hide the "weekly completion rate" percentage when there's no data (avoid 0/0 = NaN)
 
-### State Management
+### Technical Details
 
-- A `dropRevealed` flag stored in `localStorage` (keyed by week number) tracks whether the user has already seen the reveal
-- If already revealed, the Challenges page loads normally with no animation
-- The reveal only plays once per weekly reset cycle
+**File: `src/pages/Profile.tsx`**
+- Import `useAuth` hook instead of `mockUserProfile` / `mockUserVideos`
+- Pull `profile` from `useAuth()` and map its fields (`streak`, `total_completed`, `avatar`, `avatar_stage`) to the UI
+- Replace the video grid with an empty state component when no videos exist
+- Guard against division-by-zero on completion rate
 
-### Technical Plan
-
-1. **New component**: `src/components/DropReveal.tsx`
-   - Full-screen overlay with the 3-stage tap interaction
-   - Custom `BountyChest` SVG component with 3 visual states (locked, cracking, open)
-   - Framer Motion for shake, scale, and transition animations
-   - Calls `fireBigConfetti()` on final reveal
-
-2. **Update**: `src/pages/Challenges.tsx`
-   - Add `dropRevealed` state initialized from localStorage
-   - If not revealed, render `<DropReveal />` overlay instead of the challenge list
-   - On reveal complete, set localStorage flag and fade into normal challenge view
-
-3. **Update**: `src/lib/mock-data.ts`
-   - Add helper `getCurrentWeekKey()` to generate a consistent week identifier for the localStorage key
-
-4. **No new dependencies needed** -- framer-motion and canvas-confetti are already installed
+**File: `src/lib/mock-data.ts`**
+- No changes needed — mock data can stay for other pages (Feed, Challenges) that still use it
 
