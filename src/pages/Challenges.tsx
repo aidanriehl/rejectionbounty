@@ -170,7 +170,7 @@ export default function Challenges() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Weekly Prize Pool</p>
-                <p className="text-xs text-muted-foreground">Subscribe to unlock</p>
+                <p className="text-xs text-muted-foreground">Compete & win cash every week</p>
               </div>
               <Crown className="ml-auto h-4 w-4 text-primary" />
             </div>
@@ -233,7 +233,7 @@ export default function Challenges() {
                   onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
                   className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                 >
-                  {isPremium ? <Upload className="h-3 w-3" /> : <Crown className="h-3 w-3" />}
+                  <Upload className="h-3 w-3" />
                 </button>
               </motion.div>
             ))}
