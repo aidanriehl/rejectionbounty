@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,12 +14,21 @@ import FriendsPage from "@/pages/Friends";
 import NotFound from "./pages/NotFound";
 import Onboarding from "@/pages/Onboarding";
 import Setup from "@/pages/Setup";
+import FeatureTour from "@/components/FeatureTour";
 import { useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
 
 function AppRoutes() {
   const { user, profile, loading, setProfile } = useAuth();
+  const [showTour, setShowTour] = useState(
+    () => localStorage.getItem("tour_pending") === "true"
+  );
+
+  const handleTourComplete = () => {
+    localStorage.removeItem("tour_pending");
+    setShowTour(false);
+  };
 
   if (loading) {
     return (
@@ -66,6 +76,7 @@ function AppRoutes() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
+      {showTour && <FeatureTour onComplete={handleTourComplete} />}
     </>
   );
 }
