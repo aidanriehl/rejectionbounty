@@ -99,7 +99,8 @@ export default function Challenges() {
           <p className="mt-1 text-sm text-muted-foreground">Resets every Sunday</p>
         </div>
 
-        {/* Subscriber Card */}
+        {/* Subscriber Card + Prize Pool wrapper for tour */}
+        <div data-tour="prize-pool">
         {isPremium ? (
           <div className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background">
             <div className="flex items-center justify-between">
@@ -176,6 +177,7 @@ export default function Challenges() {
             </div>
           </button>
         )}
+        </div>{/* end data-tour="prize-pool" */}
 
         {/* Progress */}
         <div className="mb-5">
@@ -190,7 +192,7 @@ export default function Challenges() {
 
         {/* Challenge List */}
         <p className="mb-2 text-sm font-semibold text-foreground">Complete 5 challenges of these 10</p>
-        <div className="overflow-hidden rounded-xl border bg-card">
+        <div data-tour="challenge-list" className="overflow-hidden rounded-xl border bg-card">
           <AnimatePresence>
             {challenges.map((challenge, i) => (
               <motion.div
@@ -230,6 +232,7 @@ export default function Challenges() {
 
                 {/* Upload button — always visible */}
                 <button
+                  {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
                   onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
                   className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
                 >
