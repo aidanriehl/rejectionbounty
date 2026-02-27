@@ -207,7 +207,7 @@ export default function Profile() {
         )}
 
         {/* Stats Row */}
-        <div className="mb-5 flex gap-3">
+        <div className="mb-3 flex gap-3">
           {/* Streak */}
           <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card p-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
             <div className="flex items-center gap-2 mb-1">
@@ -228,6 +228,33 @@ export default function Profile() {
               <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}</span>
             </div>
             <p className="text-[11px] font-medium text-muted-foreground">Completed</p>
+          </div>
+        </div>
+
+        {/* Extended Stats Row */}
+        <div className="mb-5 flex gap-3">
+          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card px-3 py-3 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-sm leading-none">⚡</span>
+              <span className="text-lg font-extrabold text-foreground leading-none">{streak}</span>
+            </div>
+            <p className="text-[10px] font-medium text-muted-foreground">Best Streak</p>
+          </div>
+
+          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card px-3 py-3 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-sm leading-none">🎯</span>
+              <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
+            </div>
+            <p className="text-[10px] font-medium text-muted-foreground">Next Milestone</p>
+          </div>
+
+          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card px-3 py-3 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-sm leading-none">📅</span>
+              <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted >= 5 ? Math.floor(totalCompleted / 5) : 0}</span>
+            </div>
+            <p className="text-[10px] font-medium text-muted-foreground">Weeks Done</p>
           </div>
         </div>
 
