@@ -37,10 +37,10 @@ export default function Onboarding() {
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="text-6xl">🔥</span>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-            DareUp
+            Daily Rejection
           </h1>
           <p className="text-base text-muted-foreground">
-            Face your fears. One challenge at a time.
+            Let's get out of our comfort zone
           </p>
         </div>
 
