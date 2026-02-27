@@ -208,48 +208,48 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Stats Row */}
-        <div className="mb-5 flex gap-3">
-          {/* Streak */}
-          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card p-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg leading-none">🔥</span>
-              <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
+        {/* Stats - stacked full-width rows */}
+        <div className="mb-5 space-y-3">
+          {/* Row 1: Streak + Best Streak */}
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-3.5 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg leading-none">🔥</span>
+                <div>
+                  <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
+                  <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Day Streak</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-lg font-extrabold text-foreground leading-none">{streak}</span>
+                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Best Streak ⚡</p>
+              </div>
             </div>
-            <p className="text-[11px] font-medium text-muted-foreground">Day Streak</p>
           </div>
 
-          {/* Challenges */}
-          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card p-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
-            <div className="flex items-center gap-2 mb-1">
-              {ms.medal ? (
-                <MedalIcon tier={ms.medal.tier} size={22} />
-              ) : (
-                <span className="text-lg leading-none">🏅</span>
-              )}
-              <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}</span>
+          {/* Row 2: Completed + Milestone + Weeks */}
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-3.5 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {ms.medal ? (
+                  <MedalIcon tier={ms.medal.tier} size={22} />
+                ) : (
+                  <span className="text-lg leading-none">🏅</span>
+                )}
+                <div>
+                  <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}</span>
+                  <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Completed</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
+                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Next Milestone 🎯</p>
+              </div>
+              <div className="text-right">
+                <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted >= 5 ? Math.floor(totalCompleted / 5) : 0}</span>
+                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Weeks Done 📅</p>
+              </div>
             </div>
-            <p className="text-[11px] font-medium text-muted-foreground">Completed</p>
-          </div>
-        </div>
-
-        {/* Progress to next milestone */}
-        <div className="mb-6">
-          <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-xs font-bold text-foreground">
-              Next milestone: {ms.goal}
-            </span>
-            <span className="text-xs font-semibold text-primary">
-              {ms.current}/{ms.goal}
-            </span>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-primary"
-              initial={false}
-              animate={{ width: `${progressPct}%` }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            />
           </div>
         </div>
 
