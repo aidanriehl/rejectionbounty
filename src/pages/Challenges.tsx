@@ -10,7 +10,6 @@ import { toast } from "@/hooks/use-toast";
 import CameraRecorder from "@/components/CameraRecorder";
 import WeeklySummary from "@/components/WeeklySummary";
 import DropReveal from "@/components/DropReveal";
-import PremiumGate from "@/components/PremiumGate";
 
 const progressMessages: Record<number, string> = {
   1: "Great start!",
@@ -47,7 +46,7 @@ export default function Challenges() {
   const [challenges, setChallenges] = useState<Challenge[]>(mockChallenges);
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
-  const [showPremiumGate, setShowPremiumGate] = useState(false);
+  
   const [pendingUncheck, setPendingUncheck] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(getTimeUntilSunday);
 
@@ -58,6 +57,11 @@ export default function Challenges() {
   }, []);
 
   const isPremium = false;
+
+  const triggerSubscribe = () => {
+    // TODO: Replace with native IAP call via Capacitor plugin
+    toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
+  };
   const completed = getCompletedCount(challenges);
   const prizePool = 1247;
   const subscribers = 1832;
@@ -148,7 +152,7 @@ export default function Challenges() {
               </div>
             ) : (
               <button
-                onClick={() => setShowPremiumGate(true)}
+                onClick={triggerSubscribe}
                 className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]"
               >
                 <Users className="h-4 w-4 opacity-50 mb-2" />
@@ -167,7 +171,7 @@ export default function Challenges() {
               </div>
             ) : (
               <button
-                onClick={() => setShowPremiumGate(true)}
+                onClick={triggerSubscribe}
                 className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]"
               >
                 <Trophy className="h-4 w-4 opacity-50 mb-2" />
@@ -250,7 +254,7 @@ export default function Challenges() {
                   {/* Upload */}
                   <button
                     {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
-                    onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
+                    onClick={() => isPremium ? setChoiceChallenge(challenge) : triggerSubscribe()}
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
                       challenge.completed
@@ -391,15 +395,6 @@ export default function Challenges() {
           )}
         </AnimatePresence>
 
-        {/* Premium gate modal */}
-        <PremiumGate
-          open={showPremiumGate}
-          onClose={() => setShowPremiumGate(false)}
-          onSubscribe={() => {
-            setShowPremiumGate(false);
-            toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
-          }}
-        />
       </div>
     </>
   );
