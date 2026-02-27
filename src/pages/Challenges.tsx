@@ -36,6 +36,7 @@ export default function Challenges() {
   const [choiceChallenge, setChoiceChallenge] = useState<Challenge | null>(null);
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
   const [showPremiumGate, setShowPremiumGate] = useState(false);
+  const [pendingUncheck, setPendingUncheck] = useState<string | null>(null);
 
   // TODO: Replace with real subscription check from Apple IAP
   const isPremium = false;
@@ -52,7 +53,35 @@ export default function Challenges() {
     setTimeout(() => setJustRevealed(false), 2500);
   };
 
-  const toggleChallenge = (id: string) => {
+  const handleChallengeClick = (id: string) => {
+    const challenge = challenges.find((c) => c.id === id);
+    if (!challenge) return;
+
+    if (challenge.completed) {
+      // Show confirmation before unchecking
+      setPendingUncheck(id);
+      toast({
+        title: "Undo this challenge?",
+        description: "Are you sure you didn't complete this?",
+        action: (
+          <button
+            onClick={() => {
+              doToggle(id);
+              setPendingUncheck(null);
+            }}
+            className="rounded-md bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground"
+          >
+            Yes, undo
+          </button>
+        ),
+      });
+      return;
+    }
+
+    doToggle(id);
+  };
+
+  const doToggle = (id: string) => {
     setChallenges((prev) => {
       const challenge = prev.find((c) => c.id === id);
       if (!challenge) return prev;
@@ -213,9 +242,8 @@ export default function Challenges() {
                   challenge.completed && "bg-success/5"
                 )}
               >
-                {/* Number — tap to toggle complete */}
-                <button
-                  onClick={() => toggleChallenge(challenge.id)}
+                {/* Number */}
+                <div
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
                     challenge.completed
@@ -224,15 +252,18 @@ export default function Challenges() {
                   )}
                 >
                   {challenge.completed ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
-                </button>
+                </div>
 
-                {/* Title only */}
-                <span className={cn(
-                  "flex-1 text-left text-sm font-medium text-foreground",
-                  challenge.completed && "line-through opacity-50"
-                )}>
+                {/* Title — tap row to toggle */}
+                <button
+                  onClick={() => handleChallengeClick(challenge.id)}
+                  className={cn(
+                    "flex-1 text-left text-sm font-medium text-foreground",
+                    challenge.completed && "line-through opacity-50"
+                  )}
+                >
                   {challenge.title} {challenge.emoji}
-                </span>
+                </button>
 
                 {/* Upload button — always visible */}
                 <button
@@ -319,7 +350,7 @@ export default function Challenges() {
             challengeTitle={cameraChallenge.title}
             onClose={() => setCameraChallenge(null)}
             onRecorded={(file) => {
-              toggleChallenge(cameraChallenge.id);
+              doToggle(cameraChallenge.id);
               setCameraChallenge(null);
               
               navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
