@@ -53,7 +53,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
 }
 
 function TutorialCarousel({ onJoin, onLogin }: { onJoin: () => void; onLogin: () => void }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, containScroll: "trimSnaps" });
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onSelect = useCallback(() => {
