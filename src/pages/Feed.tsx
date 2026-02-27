@@ -77,7 +77,7 @@ function ReelCard({ post }: { post: FeedPost }) {
           <Heart
             className={cn(
               "h-7 w-7 transition-colors drop-shadow-md",
-              liked ? "fill-destructive text-destructive" : "text-white"
+              liked ? "fill-rose-500 text-rose-500" : "text-white"
             )}
           />
           <span className="text-xs font-semibold text-white drop-shadow-md">{likeCount}</span>

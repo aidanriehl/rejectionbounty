@@ -168,7 +168,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
                             ? "hsl(var(--success))"
                             : challenge.takeRate > 25
                             ? "hsl(var(--gold))"
-                            : "hsl(var(--destructive) / 0.7)",
+                            : "hsl(var(--destructive))",
                         }}
                         initial={{ width: 0 }}
                         animate={{ width: `${challenge.takeRate}%` }}
