@@ -60,7 +60,7 @@ export default function Challenges() {
 
   const triggerSubscribe = () => {
     // TODO: Replace with native IAP call via Capacitor plugin
-    toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
+    // No-op for now — native StoreKit will handle this
   };
   const completed = getCompletedCount(challenges);
   const prizePool = 1247;
@@ -256,13 +256,16 @@ export default function Challenges() {
                     {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
                     onClick={() => isPremium ? setChoiceChallenge(challenge) : triggerSubscribe()}
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors relative",
                       challenge.completed
                         ? "bg-primary/10 text-primary"
                         : "bg-muted text-muted-foreground"
                     )}
                   >
                     <Upload className="h-3.5 w-3.5" />
+                    {!isPremium && (
+                      <Crown className="absolute -top-1 -right-1 h-3 w-3 text-foreground/40" />
+                    )}
                   </button>
                 </motion.div>
               ))}
