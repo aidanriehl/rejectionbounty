@@ -364,9 +364,9 @@ export default function Challenges() {
                 className="w-72 overflow-hidden rounded-2xl bg-card shadow-xl"
               >
                 <div className="px-6 pt-6 pb-4 text-center">
-                  <p className="text-base font-semibold text-foreground">Undo this challenge?</p>
+                  <p className="text-base font-semibold text-foreground">Mark as incomplete?</p>
                   <p className="mt-1.5 text-sm text-muted-foreground">
-                    This will mark it as incomplete.
+                    You can always redo it later.
                   </p>
                 </div>
                 <div className="border-t border-border flex">
