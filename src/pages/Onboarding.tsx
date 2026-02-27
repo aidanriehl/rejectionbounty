@@ -8,19 +8,16 @@ const SPLASH_DURATION = 2200;
 
 const SLIDES = [
   {
-    tag: "WHAT IS REJECTION BOUNTY?",
     title: "Face your fears and win real cash prizes",
     description:
       "Complete rejection challenges each week to stay in the game and split the prize pool with other players.",
   },
   {
-    tag: "HOW DOES IT WORK?",
     title: "Every Sunday, 8 new challenges drop",
     description:
       "Complete at least 5 out of 8 challenges before the week ends. Film yourself doing each one to prove it.",
   },
   {
-    tag: "WHY PLAY?",
     title: "Build confidence while earning money",
     description:
       "Push past your comfort zone, grow as a person, and get paid for it. The more players, the bigger the pot.",
@@ -77,9 +74,6 @@ function TutorialCarousel({ onJoin, onLogin }: { onJoin: () => void; onLogin: ()
         <div className="flex h-full">
           {SLIDES.map((slide, i) => (
             <div key={i} className="min-w-0 flex-[0_0_100%] px-6 pt-16">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {slide.tag}
-              </p>
               <h2 className="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground">
                 {slide.title}
               </h2>
@@ -94,8 +88,9 @@ function TutorialCarousel({ onJoin, onLogin }: { onJoin: () => void; onLogin: ()
       {/* Dots */}
       <div className="flex justify-center gap-2 pb-6">
         {SLIDES.map((_, i) => (
-          <div
+          <button
             key={i}
+            onClick={() => emblaApi?.scrollTo(i)}
             className={`h-2 rounded-full transition-all duration-300 ${
               i === activeIndex
                 ? "w-6 bg-primary"
