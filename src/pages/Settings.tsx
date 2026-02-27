@@ -48,7 +48,6 @@ export default function SettingsPage() {
   useEffect(() => {
     if (searchParams.get("connect") === "complete") {
       checkConnectStatus();
-      toast({ title: "Bank account linked!", description: "Checking status..." });
     }
   }, [searchParams]);
 
@@ -101,7 +100,6 @@ export default function SettingsPage() {
 
     setAuthProfile(data as any);
     setEditingName(false);
-    toast({ title: "Name updated" });
   };
 
   return (
@@ -355,7 +353,6 @@ export default function SettingsPage() {
                     }
                     await signOut();
                     navigate("/");
-                    toast({ title: "Account deleted" });
                   }}
                 >
                   Delete
