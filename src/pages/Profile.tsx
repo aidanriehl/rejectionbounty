@@ -210,7 +210,7 @@ export default function Profile() {
         )}
 
         {/* Stats - 2 column grid */}
-        <div className="mb-5 grid grid-cols-2 gap-3">
+        <div className="mb-5 space-y-3">
           {/* Streak */}
           <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
             <div className="flex items-center gap-1.5 mb-0.5">
