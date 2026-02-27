@@ -1,62 +1,54 @@
 
 
-# Feature Tour / Onboarding Walkthrough
+## Analysis: Comprehensive UI/UX Audit
 
-## Overview
-After a new user completes Setup (username pick), they'll be taken through a guided 4-step tour that highlights key features. This is the classic "coach marks" pattern -- a semi-transparent overlay with a spotlight cutout on the target element, a tooltip card with explanation text, and a "Next" / "Got it" button to advance.
+After reviewing every page and component, here are all the issues I found with the current Kalshi-inspired palette and general UI:
 
-## Tour Steps
+### Critical Color Issues
 
-| Step | Page | Spotlight Target | Title | Description |
-|------|------|-----------------|-------|-------------|
-| 1 | `/challenges` | Prize Pool + Subscriber cards | **Win real money every week** | "Every subscriber adds to the weekly prize pool. The more people join, the bigger the pot." |
-| 2 | `/challenges` | Challenge list area | **10 challenges, pick any 5** | "Each Sunday, 10 new challenges drop. Complete at least 5 to stay in the game and keep your streak alive." |
-| 3 | `/challenges` | Upload button on a challenge row | **Film it to win** | "Upload a video of yourself completing a challenge. Subscribers are entered into the weekly cash lottery." |
-| 4 | `/` (Feed) | Feed area | **Watch the community** | "See how others are facing their fears. Like, learn, and get inspired." |
+1. **Destructive color is now invisible gray** (`0 0% 30%`). This breaks:
+   - "Yes, Undo" button in the undo dialog (looks like normal text)
+   - "Delete Account" in Settings (no danger signal)
+   - Feed like hearts (`fill-destructive`) are now gray instead of warm/visible
+   - Weekly Summary low take-rate bars are gray (no meaning)
+   - Leaderboard badges for users who didn't qualify are gray-on-gray
 
-## How it works
+2. **Everything is the same teal** -- checkmarks, progress bar, upload buttons, ring, links. No visual hierarchy. The eye has nowhere to rest or focus.
 
-### New component: `FeatureTour.tsx`
-- Renders a full-screen overlay with a spotlight "hole" around the target element
-- A tooltip card positioned near the spotlight with step title, description, step indicator dots, and Next/Done button
-- Uses `framer-motion` for smooth transitions between steps
-- Steps that are on different pages will trigger `navigate()` before highlighting
+3. **Prize pool card blur still has `overflow-hidden`** on the outer `<button>` wrapper (line 181) causing hard-edged blur on the prize pool (subscriber card was fixed but prize pool wasn't).
 
-### State management
-- After Setup completes, a flag `tour_pending` is set in `localStorage`
-- `AppRoutes` checks this flag and renders `<FeatureTour />` on top of the authenticated layout
-- When tour completes, flag is cleared so it never shows again
-- Tour can also be dismissed at any step via a "Skip" link
+### User's Previous Request Not Implemented
 
-### Step targeting
-- Each tour step specifies a CSS selector (e.g. `[data-tour="prize-pool"]`) for the spotlight target
-- We add `data-tour` attributes to the relevant elements in `Challenges.tsx` and `Feed.tsx` (minimal changes -- just adding a data attribute to existing wrapper divs)
-- The tour component uses `getBoundingClientRect()` to position the spotlight and tooltip
+4. **Dark mode toggle still exists in Settings** (lines 277-298). User previously asked to "revert the night mode and remove the option in settings."
 
-### Navigation between pages
-- Steps 1-3 are on `/challenges`, step 4 is on `/`
-- When advancing from step 3 to 4, the tour calls `navigate("/")` and waits a tick for the page to render before spotlighting
+### Plan
 
-### Visual design
-- Semi-transparent dark overlay (`bg-black/60`) with a rounded rectangle cutout via CSS clip-path or box-shadow trick
-- Tooltip card: white card with rounded corners, step title in bold, description text, dot indicators, and a primary-colored "Next" / "Got it" button
-- "Skip tour" text link in muted color
-- Smooth fade/slide transitions between steps
+**A. Fix destructive actions -- use a warm amber/orange instead of red or gray**
+- Change `--destructive` to `30 90% 50%` (amber) in both light and dark themes
+- This keeps the "no red" rule while making danger states visible and distinct from primary teal
 
-## Files to create
-- `src/components/FeatureTour.tsx` -- the tour overlay + tooltip component with all 4 steps
+**B. Add visual hierarchy with a second accent color**
+- Completed checkmarks: keep teal (`bg-success`)
+- Upload buttons: switch to a subtle warm neutral tint instead of `primary/10` to differentiate from progress
+- Progress bar label text: keep teal, it's the main CTA color
 
-## Files to modify
-- `src/pages/Setup.tsx` -- set `localStorage.setItem("tour_pending", "true")` before navigating after setup, and navigate to `/challenges` instead of `/profile`
-- `src/pages/Challenges.tsx` -- add `data-tour="prize-pool"`, `data-tour="challenge-list"`, `data-tour="upload-btn"` attributes to target elements
-- `src/pages/Feed.tsx` -- add `data-tour="feed"` attribute to the feed container
-- `src/App.tsx` -- render `<FeatureTour />` inside the authenticated layout, conditionally based on the localStorage flag
+**C. Fix the prize pool card blur** 
+- Remove `overflow-hidden` from the prize pool button wrapper (line 181), matching the subscriber card fix
 
-## Technical details
+**D. Remove dark mode toggle from Settings**
+- Delete the entire dark mode row (lines 277-298) from Settings.tsx
 
-The spotlight effect uses a box-shadow approach on a positioned div that matches the target element's bounding rect, with a massive spread `box-shadow: 0 0 0 9999px rgba(0,0,0,0.6)` to create the dark overlay around it. This avoids clip-path browser quirks.
+**E. Fix Feed like hearts**
+- Change heart color from `destructive` to a dedicated warm color (e.g., inline `text-rose-500 fill-rose-500` or use the new amber destructive) since hearts shouldn't be gray or teal
 
-The tooltip positions itself above or below the spotlight based on available space, with a small arrow/pointer toward the highlighted element.
+**F. Fix Weekly Summary color usage**
+- Low take-rate bars currently use `destructive` (gray). Switch to amber/warm tone for visual meaning
 
-Step transitions use `framer-motion` `AnimatePresence` with a fade + slight slide for the tooltip card. Page navigation transitions use a brief delay to allow the new page to mount before measuring element positions.
+### Files to Edit
+
+- `src/index.css` -- update `--destructive` to amber in both themes
+- `src/pages/Challenges.tsx` -- remove `overflow-hidden` from prize pool button
+- `src/pages/Settings.tsx` -- remove dark mode toggle row
+- `src/pages/Feed.tsx` -- change heart color from destructive to a warm pink/rose
+- `src/components/WeeklySummary.tsx` -- fix low take-rate bar color
 
