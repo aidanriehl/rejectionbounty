@@ -132,7 +132,7 @@ export default function Challenges() {
                 </div>
                 <div>
                   <p className="text-xs font-medium opacity-60">Subscribers</p>
-                  <p className="text-2xl font-bold blur-md select-none">1,832</p>
+                  <p className="text-2xl font-bold blur-sm select-none">1,832</p>
                 </div>
               </div>
               <Crown className="h-5 w-5 opacity-40" />
@@ -174,7 +174,7 @@ export default function Challenges() {
                 </div>
                 <div>
                   <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
-                  <p className="text-2xl font-bold blur-md select-none">$1,247</p>
+                  <p className="text-2xl font-bold blur-sm select-none">$1,247</p>
                 </div>
               </div>
               <Crown className="h-5 w-5 opacity-40" />
