@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import AvatarPicker from "@/components/AvatarPicker";
-import { mockUserProfile, type AvatarType } from "@/lib/mock-data";
+import { type AvatarType } from "@/lib/mock-data";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,10 +23,10 @@ import {
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signOut } = useAuth();
-  const [profile, setProfile] = useState(mockUserProfile);
+  const { user, profile: authProfile, signOut, setProfile: setAuthProfile } = useAuth();
   const [editingName, setEditingName] = useState(false);
-  const [nameValue, setNameValue] = useState(profile.username);
+  const [nameValue, setNameValue] = useState(authProfile?.username || "");
+  const [isPublic, setIsPublic] = useState(true);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [notifications, setNotifications] = useState(true);
 
@@ -82,8 +82,24 @@ export default function SettingsPage() {
     }
   };
 
-  const saveName = () => {
-    setProfile({ ...profile, username: nameValue });
+  const saveName = async () => {
+    if (!user) return;
+    const trimmed = nameValue.trim();
+    if (!trimmed) return;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ username: trimmed })
+      .eq("id", user.id)
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: "Failed to update name", variant: "destructive" });
+      return;
+    }
+
+    setAuthProfile(data as any);
     setEditingName(false);
     toast({ title: "Name updated" });
   };
@@ -124,7 +140,7 @@ export default function SettingsPage() {
               </div>
             ) : (
               <button onClick={() => setEditingName(true)} className="flex items-center gap-1 text-sm text-muted-foreground">
-                {profile.username}
+                {authProfile?.username || "Set name"}
                 <ChevronRight className="h-4 w-4" />
               </button>
             )}
@@ -140,7 +156,7 @@ export default function SettingsPage() {
             className="flex w-full items-center justify-between px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <AvatarDisplay avatar={profile.avatar} stage={profile.avatarStage} size="sm" />
+              <AvatarDisplay avatar={(authProfile?.avatar || "dragon") as AvatarType} stage={(authProfile?.avatar_stage ?? 0) as any} size="sm" />
               <div className="text-left">
                 <span className="text-sm font-medium text-foreground">Character</span>
                 <p className="text-xs text-muted-foreground">Choose your avatar</p>
@@ -151,8 +167,12 @@ export default function SettingsPage() {
           {showAvatarPicker && (
             <div className="border-t px-4 py-3">
               <AvatarPicker
-                selected={profile.avatar}
-                onSelect={(avatar: AvatarType) => setProfile({ ...profile, avatar })}
+                selected={(authProfile?.avatar || "dragon") as AvatarType}
+                onSelect={async (avatar: AvatarType) => {
+                  if (!user) return;
+                  await supabase.from("profiles").update({ avatar }).eq("id", user.id);
+                  setAuthProfile({ ...authProfile!, avatar });
+                }}
               />
             </div>
           )}
@@ -164,23 +184,23 @@ export default function SettingsPage() {
           {/* Privacy */}
           <div className="flex items-center justify-between border-b px-4 py-3">
             <div className="flex items-center gap-3">
-              {profile.isPublic ? (
+              {isPublic ? (
                 <Globe className="h-4 w-4 text-muted-foreground" />
               ) : (
                 <Lock className="h-4 w-4 text-muted-foreground" />
               )}
               <div>
                 <span className="text-sm font-medium text-foreground">
-                  {profile.isPublic ? "Public Profile" : "Private Profile"}
+                  {isPublic ? "Public Profile" : "Private Profile"}
                 </span>
                 <p className="text-xs text-muted-foreground">
-                  {profile.isPublic ? "Anyone can see your profile" : "Only friends can see your profile"}
+                  {isPublic ? "Anyone can see your profile" : "Only friends can see your profile"}
                 </p>
               </div>
             </div>
             <Switch
-              checked={profile.isPublic}
-              onCheckedChange={(checked) => setProfile({ ...profile, isPublic: checked })}
+              checked={isPublic}
+              onCheckedChange={setIsPublic}
             />
           </div>
 
