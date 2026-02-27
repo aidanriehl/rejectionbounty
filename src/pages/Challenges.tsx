@@ -64,17 +64,18 @@ export default function Challenges() {
 
       if (!challenge.completed) {
         const newCount = getCompletedCount(next);
-        if (navigator.vibrate) navigator.vibrate(50);
         if (newCount === 10) {
           fireEpicConfetti();
           playEpicWin();
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+          if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 200, 80, 400]);
         } else if (newCount === 5) {
           fireBigConfetti();
           playBigWin();
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
         } else {
           fireConfetti();
           playPop();
+          if (navigator.vibrate) navigator.vibrate(50);
         }
       }
 
