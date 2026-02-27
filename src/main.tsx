@@ -3,11 +3,7 @@ import App from "./App.tsx";
 import "./index.css";
 
 // Apply saved theme (default to dark)
-const savedTheme = localStorage.getItem("theme") || "dark";
-if (savedTheme === "dark") {
-  document.documentElement.classList.add("dark");
-} else {
-  document.documentElement.classList.remove("dark");
-}
+// Ensure light mode (branded look)
+document.documentElement.classList.remove("dark");
 
 createRoot(document.getElementById("root")!).render(<App />);
