@@ -154,10 +154,10 @@ export default function SettingsPage() {
         <div className="mb-5 overflow-hidden rounded-xl border bg-card">
           {/* Display Name */}
           <div className="flex items-center justify-between border-b px-4 py-3">
-            <div className="flex items-center gap-3">
+            <button onClick={() => setEditingName(true)} className="flex items-center gap-3">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium text-foreground">Display Name</span>
-            </div>
+            </button>
             {editingName ? (
               <div className="flex items-center gap-2">
                 <input
@@ -179,10 +179,10 @@ export default function SettingsPage() {
 
           {/* Profile Photo */}
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-3">
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-3">
               <Camera className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium text-foreground">Profile Photo</span>
-            </div>
+            </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
