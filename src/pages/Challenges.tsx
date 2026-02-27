@@ -317,7 +317,7 @@ export default function Challenges() {
             onRecorded={(file) => {
               toggleChallenge(cameraChallenge.id);
               setCameraChallenge(null);
-              toast({ title: "Video recorded!", description: "Uploading your challenge video..." });
+              
               navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
             }}
           />
