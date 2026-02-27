@@ -242,8 +242,9 @@ export default function Challenges() {
                   challenge.completed && "bg-success/5"
                 )}
               >
-                {/* Number */}
-                <div
+                {/* Number — tap to toggle */}
+                <button
+                  onClick={() => handleChallengeClick(challenge.id)}
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
                     challenge.completed
@@ -252,7 +253,7 @@ export default function Challenges() {
                   )}
                 >
                   {challenge.completed ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
-                </div>
+                </button>
 
                 {/* Title — tap row to toggle */}
                 <button
