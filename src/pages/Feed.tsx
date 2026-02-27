@@ -178,11 +178,7 @@ export default function Feed() {
           <div key={TABS[i].key} className="h-full w-full flex-shrink-0">
             <FeedPane
               posts={posts}
-              emptyMessage={
-                i === 0 ? "No videos submitted yet" :
-                i === 1 ? "Add friends to see their videos here" :
-                "No videos submitted yet"
-              }
+              emptyMessage="No videos uploaded yet"
             />
           </div>
         ))}
