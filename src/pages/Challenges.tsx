@@ -122,24 +122,18 @@ export default function Challenges() {
         <div className="mx-auto max-w-lg px-4">
 
           {/* Countdown Card */}
-          <div className="mb-4 rounded-2xl border-2 border-foreground bg-card p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🎯</span>
-                <div>
-                  <p className="text-sm font-bold text-foreground leading-tight">This Week's Drop</p>
-                  <p className="text-xs text-muted-foreground">Resets Sunday</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <CountdownDigit value={countdown.days} label="Days" />
-                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
-                <CountdownDigit value={countdown.hours} label="Hours" />
-                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
-                <CountdownDigit value={countdown.minutes} label="Min" />
-                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
-                <CountdownDigit value={countdown.seconds} label="Sec" />
-              </div>
+          <div className="mb-4 rounded-2xl border-2 border-foreground bg-card p-4 shadow-[4px_4px_0px_0px_hsl(var(--foreground))]">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🎯</span>
+              <p className="text-sm font-bold text-foreground leading-tight">This Week's Drop</p>
+              <span className="text-xs text-muted-foreground">· Resets Sunday</span>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <CountdownDigit value={countdown.days} label="Days" />
+              <span className="text-xl font-bold text-muted-foreground/30 -mt-3">:</span>
+              <CountdownDigit value={countdown.hours} label="Hours" />
+              <span className="text-xl font-bold text-muted-foreground/30 -mt-3">:</span>
+              <CountdownDigit value={countdown.minutes} label="Min" />
             </div>
           </div>
 
@@ -147,7 +141,7 @@ export default function Challenges() {
           <div data-tour="prize-pool" className="flex gap-3 mb-5">
             {/* Subscribers */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background">
+              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]">
                 <Users className="h-4 w-4 opacity-50 mb-2" />
                 <p className="text-2xl font-extrabold">{subscribers.toLocaleString()}</p>
                 <p className="text-[11px] font-medium opacity-50">Subscribers</p>
@@ -155,7 +149,7 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={() => setShowPremiumGate(true)}
-                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative"
+                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]"
               >
                 <Users className="h-4 w-4 opacity-50 mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
@@ -166,7 +160,7 @@ export default function Challenges() {
 
             {/* Prize Pool */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background">
+              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]">
                 <Trophy className="h-4 w-4 opacity-50 mb-2" />
                 <p className="text-2xl font-extrabold">${prizePool.toLocaleString()}</p>
                 <p className="text-[11px] font-medium opacity-50">Prize Pool</p>
@@ -174,7 +168,7 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={() => setShowPremiumGate(true)}
-                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative"
+                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.3)]"
               >
                 <Trophy className="h-4 w-4 opacity-50 mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
@@ -220,10 +214,10 @@ export default function Challenges() {
                     : { duration: 0 }
                   }
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl border px-4 py-3.5 transition-all",
+                    "group flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-all",
                     challenge.completed
-                      ? "border-primary/20 bg-primary/5"
-                      : "border-border bg-card"
+                      ? "border-primary/30 bg-primary/5 shadow-[2px_2px_0px_0px_hsl(var(--primary)/0.2)]"
+                      : "border-foreground/10 bg-card shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]"
                   )}
                 >
                   {/* Checkbox */}

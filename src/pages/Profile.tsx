@@ -1,10 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Settings, Grid3X3, Camera, ImagePlus } from "lucide-react";
+import { motion } from "framer-motion";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { avatarLabels, avatarEmojis } from "@/lib/mock-data";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -75,47 +73,31 @@ export default function Profile() {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast({ title: "Please select an image file", variant: "destructive" });
       return;
     }
-
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
       toast({ title: "Image must be under 5MB", variant: "destructive" });
       return;
     }
-
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
       const filePath = `${user.id}/avatar.${ext}`;
-
-      // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, { upsert: true });
-
       if (uploadError) throw uploadError;
-
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
-
-      // Add cache buster
       const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
-
-      // Update profile
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ profile_photo_url: urlWithBuster })
         .eq("id", user.id);
-
       if (updateError) throw updateError;
-
       setProfile({ ...profile!, profile_photo_url: urlWithBuster });
       toast({ title: "Profile photo updated!" });
     } catch (err) {
@@ -123,7 +105,6 @@ export default function Profile() {
       toast({ title: "Failed to upload photo", variant: "destructive" });
     } finally {
       setUploading(false);
-      // Reset input so same file can be re-selected
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -149,12 +130,15 @@ export default function Profile() {
     );
   }
 
+  const ms = getMilestone(totalCompleted);
+  const progressPct = Math.min((ms.current / ms.goal) * 100, 100);
+
   return (
     <div className="min-h-screen pb-24 pt-4">
       <div className="mx-auto max-w-lg px-4">
         {/* Top bar */}
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">{username}</h1>
+          <h1 className="text-xl font-extrabold text-foreground">{username}</h1>
           <button
             onClick={() => navigate("/settings")}
             className="flex h-9 w-9 items-center justify-center rounded-full text-foreground"
@@ -164,7 +148,7 @@ export default function Profile() {
         </div>
 
         {/* Avatar with long-press to change photo */}
-        <div className="mb-5 flex flex-col items-center">
+        <div className="mb-6 flex flex-col items-center">
           <div
             className="relative inline-flex cursor-pointer select-none"
             onPointerDown={handleLongPressStart}
@@ -178,26 +162,13 @@ export default function Profile() {
               size="lg"
               photoUrl={photoUrl}
             />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhotoUpload}
-            />
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="user"
-              className="hidden"
-              onChange={handlePhotoUpload}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoUpload} />
           </div>
           {uploading && (
             <p className="mt-1 text-[10px] text-muted-foreground">Uploading…</p>
           )}
-          <p className="mt-1 text-[10px] text-muted-foreground/50">Hold to change photo</p>
+          <p className="mt-1.5 text-[10px] text-muted-foreground/40">Hold to change photo</p>
         </div>
 
         {/* Photo action sheet */}
@@ -212,20 +183,14 @@ export default function Profile() {
             >
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted" />
               <button
-                onClick={() => {
-                  setShowPhotoMenu(false);
-                  cameraInputRef.current?.click();
-                }}
+                onClick={() => { setShowPhotoMenu(false); cameraInputRef.current?.click(); }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-foreground active:bg-muted"
               >
                 <Camera className="h-4 w-4 text-muted-foreground" />
                 Take Photo
               </button>
               <button
-                onClick={() => {
-                  setShowPhotoMenu(false);
-                  fileInputRef.current?.click();
-                }}
+                onClick={() => { setShowPhotoMenu(false); fileInputRef.current?.click(); }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-foreground active:bg-muted"
               >
                 <ImagePlus className="h-4 w-4 text-muted-foreground" />
@@ -241,53 +206,50 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Streak Card */}
-        <Card className="mb-3">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <p className="flex items-center gap-2">
-                <span className="text-2xl leading-none">🔥</span>
-                <span className="text-2xl font-bold text-foreground leading-none">{streak}</span>
-                <span className="text-lg font-bold text-foreground leading-none">Day Streak</span>
-              </p>
-              <p className="text-xs text-muted-foreground">Best: {streak} days</p>
+        {/* Stats Row */}
+        <div className="mb-5 flex gap-3">
+          {/* Streak */}
+          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card p-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg leading-none">🔥</span>
+              <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-[11px] font-medium text-muted-foreground">Day Streak</p>
+          </div>
 
-        {/* Challenges Card */}
-        {(() => {
-          const ms = getMilestone(totalCompleted);
-          const progressPct = Math.min((ms.current / ms.goal) * 100, 100);
-          return (
-            <Card className="mb-5">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <p className="flex items-center gap-2">
-                    {ms.medal && (
-                      <span className="flex items-center"><MedalIcon tier={ms.medal.tier} size={28} /></span>
-                    )}
-                    <span className="text-2xl font-bold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
-                    <span className="text-lg font-bold text-foreground leading-none">Challenges Completed</span>
-                  </p>
-                </div>
-                <div className="mt-2">
-                  <Progress value={progressPct} className="h-2" />
-                  <div className="mt-1 flex items-center justify-between">
-                    {totalCompleted > 0 && (
-                      <p className="text-[10px] text-muted-foreground">
-                        Next milestone: {ms.goal}
-                      </p>
-                    )}
-                    <p className="text-[10px] text-muted-foreground ml-auto">
-                      {ms.current}/{ms.goal}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })()}
+          {/* Challenges */}
+          <div className="flex-1 rounded-2xl border-2 border-foreground/10 bg-card p-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-2 mb-1">
+              {ms.medal ? (
+                <MedalIcon tier={ms.medal.tier} size={22} />
+              ) : (
+                <span className="text-lg leading-none">🏅</span>
+              )}
+              <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}</span>
+            </div>
+            <p className="text-[11px] font-medium text-muted-foreground">Completed</p>
+          </div>
+        </div>
+
+        {/* Progress to next milestone */}
+        <div className="mb-6">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs font-bold text-foreground">
+              Next milestone: {ms.goal}
+            </span>
+            <span className="text-xs font-semibold text-primary">
+              {ms.current}/{ms.goal}
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-primary"
+              initial={false}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            />
+          </div>
+        </div>
 
         {/* Grid icon + divider */}
         <div className="mb-0.5 flex justify-center border-b border-border pb-2">
@@ -296,7 +258,7 @@ export default function Profile() {
 
         {/* Empty state for video grid */}
         <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-muted-foreground text-center">No challenge videos<br />uploaded yet</p>
+          <p className="text-sm text-muted-foreground text-center">No videos uploaded yet</p>
         </div>
       </div>
     </div>
