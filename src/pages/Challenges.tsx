@@ -365,7 +365,7 @@ export default function Challenges() {
               <div className="px-6 pt-6 pb-4 text-center">
                 <p className="text-base font-semibold text-foreground">Undo this challenge?</p>
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Are you sure you didn't complete this?
+                  Click this by accident?
                 </p>
               </div>
               <div className="border-t border-border flex">
