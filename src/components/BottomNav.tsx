@@ -27,7 +27,7 @@ export default function BottomNav() {
               className={cn(
                 "flex items-center justify-center rounded-full p-3 transition-colors",
                 active
-                  ? "text-foreground"
+                  ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
