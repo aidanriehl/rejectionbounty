@@ -146,7 +146,7 @@ export default function Feed() {
   return (
     <div data-tour="feed" className="relative h-[calc(100vh-5rem)] w-full overflow-hidden bg-black">
       {/* Tab bar overlay */}
-      <div className="absolute top-0 inset-x-0 z-10 pt-12 px-4">
+      <div className="absolute top-0 inset-x-0 z-10 pt-9 px-4">
         <div className="flex items-center justify-center gap-4">
           {TABS.map((tab, i) => (
             <button
