@@ -58,25 +58,11 @@ export default function Challenges() {
     if (!challenge) return;
 
     if (challenge.completed) {
-      // Show confirmation before unchecking
       setPendingUncheck(id);
-      toast({
-        title: "Undo this challenge?",
-        description: "Are you sure you didn't complete this?",
-        action: (
-          <button
-            onClick={() => {
-              doToggle(id);
-              setPendingUncheck(null);
-            }}
-            className="rounded-md bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground"
-          >
-            Yes, undo
-          </button>
-        ),
-      });
       return;
     }
+
+    doToggle(id);
 
     doToggle(id);
   };
@@ -360,13 +346,58 @@ export default function Challenges() {
         )}
       </AnimatePresence>
 
+      {/* Undo confirmation — iOS low battery style */}
+      <AnimatePresence>
+        {pendingUncheck && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => setPendingUncheck(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85 }}
+              transition={{ type: "spring", damping: 25, stiffness: 400 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-72 overflow-hidden rounded-2xl bg-card shadow-xl"
+            >
+              <div className="px-6 pt-6 pb-4 text-center">
+                <p className="text-base font-semibold text-foreground">Undo this challenge?</p>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  Are you sure you didn't complete this?
+                </p>
+              </div>
+              <div className="border-t border-border flex">
+                <button
+                  onClick={() => setPendingUncheck(null)}
+                  className="flex-1 py-3 text-sm font-medium text-primary border-r border-border"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    doToggle(pendingUncheck);
+                    setPendingUncheck(null);
+                  }}
+                  className="flex-1 py-3 text-sm font-semibold text-destructive"
+                >
+                  Yes, Undo
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Premium gate modal */}
       <PremiumGate
         open={showPremiumGate}
         onClose={() => setShowPremiumGate(false)}
         onSubscribe={() => {
           setShowPremiumGate(false);
-          // TODO: Trigger Apple IAP here
           toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
         }}
       />
