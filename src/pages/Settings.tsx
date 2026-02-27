@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, Camera, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import AvatarPicker from "@/components/AvatarPicker";
 import { type AvatarType } from "@/lib/mock-data";
@@ -29,6 +29,8 @@ export default function SettingsPage() {
   const [isPublic, setIsPublic] = useState(true);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Stripe Connect state
   const [connectStatus, setConnectStatus] = useState<{
@@ -102,6 +104,38 @@ export default function SettingsPage() {
     setEditingName(false);
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image must be under 5MB", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const filePath = `${user.id}/avatar.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+      const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
+      const { error: updateError } = await supabase.from("profiles").update({ profile_photo_url: urlWithBuster }).eq("id", user.id);
+      if (updateError) throw updateError;
+      setAuthProfile({ ...authProfile!, profile_photo_url: urlWithBuster });
+      toast({ title: "Profile photo updated!" });
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast({ title: "Failed to upload photo", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="min-h-screen pb-24 pt-4">
       <div className="mx-auto max-w-lg px-4">
@@ -144,6 +178,28 @@ export default function SettingsPage() {
             )}
           </div>
 
+          {/* Profile Photo */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
+              <Camera className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Profile Photo</span>
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex items-center gap-1 text-sm text-muted-foreground"
+            >
+              {uploading ? "Uploading…" : "Change"}
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+          </div>
         </div>
 
         {/* Avatar Section */}
