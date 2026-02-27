@@ -153,7 +153,7 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/5 border border-primary/20 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl bg-primary/10 border border-primary/20 p-4 text-foreground text-left relative"
               >
                 <Users className="h-4 w-4 text-primary/60 mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
@@ -172,7 +172,7 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/5 border border-primary/20 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl bg-primary/10 border border-primary/20 p-4 text-foreground text-left relative"
               >
                 <Trophy className="h-4 w-4 text-primary/60 mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
