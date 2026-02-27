@@ -170,7 +170,7 @@ export default function PostPage() {
 
         {/* Upload progress bar */}
         {uploadStatus === "uploading" && (
-          <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="mb-4 h-4 w-full overflow-hidden rounded-full border-2 border-foreground/10 bg-muted shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
             <div
               className="h-full rounded-full bg-primary transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}

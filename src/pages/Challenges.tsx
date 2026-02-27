@@ -188,7 +188,7 @@ export default function Challenges() {
                 {progressMessages[completed] || ""}
               </span>
             </div>
-            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+            <div className="h-4 rounded-full border-2 border-foreground/10 bg-muted overflow-hidden shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
               <motion.div
                 className="h-full rounded-full bg-primary"
                 initial={false}
