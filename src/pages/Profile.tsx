@@ -147,8 +147,8 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Avatar with long-press to change photo */}
-        <div className="mb-5 flex flex-col items-center">
+        {/* Avatar */}
+        <div className="mb-6 mt-2 flex flex-col items-center">
           <div
             className="relative inline-flex cursor-pointer select-none"
             onPointerDown={handleLongPressStart}
@@ -161,6 +161,7 @@ export default function Profile() {
               stage={avatarStage}
               size="lg"
               photoUrl={photoUrl}
+              className="!h-[104px] !w-[104px] !text-5xl"
             />
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoUpload} />
@@ -208,48 +209,26 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Stats - stacked full-width rows */}
-        <div className="mb-5 space-y-3">
-          {/* Row 1: Streak + Best Streak */}
-          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-3.5 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-lg leading-none">🔥</span>
-                <div>
-                  <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
-                  <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Day Streak</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="text-lg font-extrabold text-foreground leading-none">{streak}</span>
-                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Best Streak ⚡</p>
-              </div>
+        {/* Stats - 2 column grid */}
+        <div className="mb-5 grid grid-cols-2 gap-3">
+          {/* Streak */}
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-lg leading-none">🔥</span>
+              <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
             </div>
+            <p className="text-[11px] font-medium text-muted-foreground">day streak</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1.5">best streak: {streak}</p>
           </div>
 
-          {/* Row 2: Completed + Milestone + Weeks */}
-          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-3.5 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {ms.medal ? (
-                  <MedalIcon tier={ms.medal.tier} size={22} />
-                ) : (
-                  <span className="text-lg leading-none">🏅</span>
-                )}
-                <div>
-                  <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}</span>
-                  <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Completed</p>
-                </div>
-              </div>
-              <div className="text-center">
-                <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
-                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Next Milestone 🎯</p>
-              </div>
-              <div className="text-right">
-                <span className="text-lg font-extrabold text-foreground leading-none">{totalCompleted >= 5 ? Math.floor(totalCompleted / 5) : 0}</span>
-                <p className="text-[11px] font-medium text-muted-foreground mt-0.5">Weeks Done 📅</p>
-              </div>
+          {/* Challenges */}
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-lg leading-none">🎯</span>
+              <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
             </div>
+            <p className="text-[11px] font-medium text-muted-foreground">challenges completed</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1.5">{totalCompleted >= 5 ? Math.round((Math.floor(totalCompleted / 5) / 52) * 100) : 0}% weeks completed</p>
           </div>
         </div>
 
