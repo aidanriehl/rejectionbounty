@@ -214,7 +214,7 @@ export default function Challenges() {
                     : { duration: 0 }
                   }
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl border-2 px-4 py-2.5 transition-all",
+                    "group flex items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all",
                     challenge.completed
                       ? "border-primary/30 bg-primary/5 shadow-[2px_2px_0px_0px_hsl(var(--primary)/0.2)]"
                       : "border-foreground/10 bg-card shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]"
@@ -243,8 +243,8 @@ export default function Challenges() {
                         : "text-foreground"
                     )}
                   >
-                    <span className="mr-1.5">{challenge.emoji}</span>
                     {challenge.title}
+                    <span className="ml-1.5">{challenge.emoji}</span>
                   </button>
 
                   {/* Upload */}
