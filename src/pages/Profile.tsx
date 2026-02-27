@@ -233,7 +233,7 @@ export default function Profile() {
 
         {/* Empty state for video grid */}
         <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-muted-foreground">No videos uploaded yet</p>
+          <p className="text-sm text-muted-foreground">No challenge videos uploaded yet</p>
         </div>
       </div>
     </div>
