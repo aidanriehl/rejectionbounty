@@ -216,7 +216,7 @@ export default function Profile() {
             <div className="flex items-center gap-1.5">
               <span className="text-lg leading-none">🔥</span>
               <span className="text-3xl font-extrabold text-foreground leading-none">{streak}</span>
-              <span className="text-base font-extrabold text-foreground leading-none">day streak</span>
+              <span className="text-lg font-bold text-foreground leading-none">Day streak</span>
             </div>
             <p className="text-[10px] text-muted-foreground/50 mt-1.5">best streak: {streak}</p>
           </div>
@@ -226,7 +226,7 @@ export default function Profile() {
             <div className="flex items-center gap-1.5">
               <span className="text-lg leading-none">🎯</span>
               <span className="text-3xl font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
-              <span className="text-base font-extrabold text-foreground leading-none">challenges completed</span>
+              <span className="text-lg font-bold text-foreground leading-none">Challenges completed</span>
             </div>
             <p className="text-[10px] text-muted-foreground/50 mt-1.5">{totalCompleted >= 5 ? Math.round((Math.floor(totalCompleted / 5) / 52) * 100) : 0}% weeks completed</p>
           </div>
