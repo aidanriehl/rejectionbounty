@@ -49,7 +49,6 @@ export default function Challenges() {
     setDropRevealed(true);
     setJustRevealed(true);
     playCascade(10, 900);
-    // Reset after animation completes
     setTimeout(() => setJustRevealed(false), 2500);
   };
 
@@ -124,17 +123,19 @@ export default function Challenges() {
         ) : (
           <button
             onClick={() => setShowPremiumGate(true)}
-            className="mb-3 w-full overflow-hidden rounded-xl bg-foreground/5 border border-dashed border-muted-foreground/20 p-4 text-left"
+            className="mb-3 w-full overflow-hidden rounded-xl bg-foreground p-4 text-background text-left"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Users className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium opacity-60">Subscribers</p>
+                  <p className="text-2xl font-bold blur-md select-none">1,832</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Subscriber Count</p>
-                <p className="text-xs text-muted-foreground">Every subscriber increases prize pool by $3.12</p>
-              </div>
-              <Crown className="ml-auto h-4 w-4 text-primary" />
+              <Crown className="h-5 w-5 opacity-40" />
             </div>
           </button>
         )}
@@ -164,17 +165,19 @@ export default function Challenges() {
         ) : (
           <button
             onClick={() => setShowPremiumGate(true)}
-            className="mb-5 w-full overflow-hidden rounded-xl bg-foreground/5 border border-dashed border-muted-foreground/20 p-4 text-left"
+            className="mb-5 w-full overflow-hidden rounded-xl bg-foreground p-4 text-background text-left"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Trophy className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
+                  <Trophy className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
+                  <p className="text-2xl font-bold blur-md select-none">$1,247</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Weekly Prize Pool</p>
-                <p className="text-xs text-muted-foreground">Compete for cash every week</p>
-              </div>
-              <Crown className="ml-auto h-4 w-4 text-primary" />
+              <Crown className="h-5 w-5 opacity-40" />
             </div>
           </button>
         )}
