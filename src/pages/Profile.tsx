@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
 
         {/* Avatar */}
-        <div className="mb-6 mt-2 flex flex-col items-center">
+        <div className="mb-6 mt-6 flex flex-col items-center">
           <div
             className="relative inline-flex cursor-pointer select-none"
             onPointerDown={handleLongPressStart}
