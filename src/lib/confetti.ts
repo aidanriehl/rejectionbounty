@@ -3,7 +3,7 @@ import confetti from "canvas-confetti";
 /** Single task completion — side cannons burst */
 export function fireConfetti() {
   const colors = ["#6C5CE7", "#00B894", "#FDCB6E", "#E17055", "#74B9FF", "#FFD700"];
-  const end = Date.now() + 1500;
+  const end = Date.now() + 700;
   const frame = () => {
     confetti({
       particleCount: 6,
@@ -36,7 +36,7 @@ export function fireBigConfetti() {
     gravity: 0.8,
     ticks: 300,
   });
-  const end = Date.now() + 3000;
+  const end = Date.now() + 1500;
   const frame = () => {
     confetti({
       particleCount: 8,
@@ -98,7 +98,7 @@ export function fireEpicConfetti() {
   }, 400);
 
   // Long-running multi-source cannons for 5 seconds
-  const end = Date.now() + 5000;
+  const end = Date.now() + 2500;
   const frame = () => {
     // Left cannon
     confetti({ particleCount: 10, angle: 60, spread: 90, origin: { x: 0, y: 0.4 }, colors, startVelocity: 45 });
