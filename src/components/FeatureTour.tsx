@@ -21,9 +21,9 @@ const STEPS: TourStep[] = [
   {
     route: "/challenges",
     selector: '[data-tour="challenge-list"]',
-    title: "10 challenges, pick any 5",
+    title: "8 challenges, pick any 5",
     description:
-      "Each Sunday, 10 new challenges drop. Complete at least 5 to stay in the game and keep your streak alive.",
+      "Each Sunday, 8 new challenges drop. Complete at least 5 to stay in the game and keep your streak alive.",
   },
   {
     route: "/challenges",

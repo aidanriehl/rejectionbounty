@@ -200,7 +200,7 @@ export default function Challenges() {
 
           {/* Challenge List */}
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Complete 5 of 10 challenges
+            Complete 5 of 8 challenges
           </p>
           <div data-tour="challenge-list" className="space-y-2">
             <AnimatePresence>
