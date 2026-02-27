@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
 
         {/* Avatar */}
-        <div className="mb-6 mt-6 flex flex-col items-center">
+        <div className="mb-6 mt-8 flex flex-col items-center">
           <div
             className="relative inline-flex cursor-pointer select-none"
             onPointerDown={handleLongPressStart}
@@ -215,8 +215,8 @@ export default function Profile() {
           <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
             <div className="flex items-center gap-1.5">
               <span className="text-lg leading-none">🔥</span>
-              <span className="text-2xl font-extrabold text-foreground leading-none">{streak}</span>
-              <span className="text-sm font-extrabold text-foreground leading-none">day streak</span>
+              <span className="text-3xl font-extrabold text-foreground leading-none">{streak}</span>
+              <span className="text-base font-extrabold text-foreground leading-none">day streak</span>
             </div>
             <p className="text-[10px] text-muted-foreground/50 mt-1.5">best streak: {streak}</p>
           </div>
@@ -225,8 +225,8 @@ export default function Profile() {
           <div className="rounded-2xl border-2 border-foreground/10 bg-card px-4 py-4 shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.06)]">
             <div className="flex items-center gap-1.5">
               <span className="text-lg leading-none">🎯</span>
-              <span className="text-2xl font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
-              <span className="text-sm font-extrabold text-foreground leading-none">challenges completed</span>
+              <span className="text-3xl font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
+              <span className="text-base font-extrabold text-foreground leading-none">challenges completed</span>
             </div>
             <p className="text-[10px] text-muted-foreground/50 mt-1.5">{totalCompleted >= 5 ? Math.round((Math.floor(totalCompleted / 5) / 52) * 100) : 0}% weeks completed</p>
           </div>
