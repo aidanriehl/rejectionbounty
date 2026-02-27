@@ -145,17 +145,17 @@ export default function Challenges() {
           <div data-tour="prize-pool" className="flex gap-3 mb-5">
             {/* Subscribers */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-primary/5 border border-primary/20 p-4 text-foreground">
-                <Users className="h-4 w-4 text-primary/60 mb-2" />
+              <div className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground">
+                <Users className="h-4 w-4 text-primary mb-2" />
                 <p className="text-2xl font-extrabold">{subscribers.toLocaleString()}</p>
                 <p className="text-[11px] font-medium text-muted-foreground">Subscribers</p>
               </div>
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/10 border border-primary/20 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground text-left relative"
               >
-                <Users className="h-4 w-4 text-primary/60 mb-2" />
+                <Users className="h-4 w-4 text-primary mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
                 <p className="text-[11px] font-medium text-muted-foreground">Subscribers</p>
                 <Crown className="absolute top-3 right-3 h-4 w-4 text-primary/30" />
@@ -164,17 +164,17 @@ export default function Challenges() {
 
             {/* Prize Pool */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-primary/5 border border-primary/20 p-4 text-foreground">
-                <Trophy className="h-4 w-4 text-primary/60 mb-2" />
+              <div className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground">
+                <Trophy className="h-4 w-4 text-primary mb-2" />
                 <p className="text-2xl font-extrabold">${prizePool.toLocaleString()}</p>
                 <p className="text-[11px] font-medium text-muted-foreground">Prize Pool</p>
               </div>
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/10 border border-primary/20 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground text-left relative"
               >
-                <Trophy className="h-4 w-4 text-primary/60 mb-2" />
+                <Trophy className="h-4 w-4 text-primary mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
                 <p className="text-[11px] font-medium text-muted-foreground">Prize Pool</p>
                 <Crown className="absolute top-3 right-3 h-4 w-4 text-primary/30" />
