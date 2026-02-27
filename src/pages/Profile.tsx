@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Grid3X3, Plus } from "lucide-react";
+import { Settings, Grid3X3, Camera, ImagePlus } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { avatarLabels, avatarEmojis } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
@@ -59,7 +59,10 @@ export default function Profile() {
   const { user, profile, loading, setProfile } = useAuth();
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
   const username = profile?.username || "Username";
@@ -125,6 +128,19 @@ export default function Profile() {
     }
   };
 
+  const handleLongPressStart = useCallback(() => {
+    longPressTimer.current = setTimeout(() => {
+      setShowPhotoMenu(true);
+    }, 500);
+  }, []);
+
+  const handleLongPressEnd = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -147,24 +163,30 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Avatar with photo upload */}
+        {/* Avatar with long-press to change photo */}
         <div className="mb-5 flex flex-col items-center">
-          <div className="relative inline-flex">
+          <div
+            className="relative inline-flex cursor-pointer select-none"
+            onPointerDown={handleLongPressStart}
+            onPointerUp={handleLongPressEnd}
+            onPointerLeave={handleLongPressEnd}
+            onContextMenu={(e) => e.preventDefault()}
+          >
             <AvatarDisplay
               avatar={avatar}
               stage={avatarStage}
               size="lg"
               photoUrl={photoUrl}
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md border-2 border-background"
-            >
-              <Plus className="h-3 w-3" strokeWidth={3} />
-            </button>
             <input
               ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+            <input
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="user"
@@ -175,7 +197,49 @@ export default function Profile() {
           {uploading && (
             <p className="mt-1 text-[10px] text-muted-foreground">Uploading…</p>
           )}
+          <p className="mt-1 text-[10px] text-muted-foreground/50">Hold to change photo</p>
         </div>
+
+        {/* Photo action sheet */}
+        {showPhotoMenu && (
+          <div
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+            onClick={() => setShowPhotoMenu(false)}
+          >
+            <div
+              className="w-full max-w-lg animate-in slide-in-from-bottom-4 duration-200 rounded-t-2xl bg-card p-2 pb-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted" />
+              <button
+                onClick={() => {
+                  setShowPhotoMenu(false);
+                  cameraInputRef.current?.click();
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-foreground active:bg-muted"
+              >
+                <Camera className="h-4 w-4 text-muted-foreground" />
+                Take Photo
+              </button>
+              <button
+                onClick={() => {
+                  setShowPhotoMenu(false);
+                  fileInputRef.current?.click();
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-foreground active:bg-muted"
+              >
+                <ImagePlus className="h-4 w-4 text-muted-foreground" />
+                Choose from Library
+              </button>
+              <button
+                onClick={() => setShowPhotoMenu(false)}
+                className="mt-1 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground active:bg-muted"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Streak Card */}
         <Card className="mb-3">
