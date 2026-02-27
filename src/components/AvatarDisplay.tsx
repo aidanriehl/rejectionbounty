@@ -26,7 +26,7 @@ interface AvatarDisplayProps {
 const sizeClasses = {
   sm: "h-8 w-8 text-base",
   md: "h-12 w-12 text-xl",
-  lg: "h-20 w-20 text-3xl",
+  lg: "h-24 w-24 text-4xl",
 };
 
 const ringClasses = {

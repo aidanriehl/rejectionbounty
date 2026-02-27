@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
 
         {/* Avatar with long-press to change photo */}
-        <div className="mb-6 flex flex-col items-center">
+        <div className="mb-5 flex flex-col items-center">
           <div
             className="relative inline-flex cursor-pointer select-none"
             onPointerDown={handleLongPressStart}
@@ -168,7 +168,9 @@ export default function Profile() {
           {uploading && (
             <p className="mt-1 text-[10px] text-muted-foreground">Uploading…</p>
           )}
-          <p className="mt-1.5 text-[10px] text-muted-foreground/40">Hold to change photo</p>
+          {!photoUrl && (
+            <p className="mt-1.5 text-[10px] text-muted-foreground/40">Hold to set photo</p>
+          )}
         </div>
 
         {/* Photo action sheet */}
