@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Settings, Grid3X3, Camera } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { avatarLabels } from "@/lib/mock-data";
+import { avatarLabels, avatarEmojis } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
@@ -149,19 +149,20 @@ export default function Profile() {
 
         {/* Avatar with photo upload */}
         <div className="mb-5 flex flex-col items-center">
-          <div className="relative">
-            <AvatarDisplay
-              avatar={avatar}
-              stage={avatarStage}
-              size="lg"
-              photoUrl={photoUrl}
-            />
+          <div className="relative inline-flex">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full overflow-hidden bg-muted ring-[3px] ring-border">
+              {photoUrl ? (
+                <img src={photoUrl} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-4xl">{avatarEmojis[avatar]?.[avatarStage] ?? "🐉"}</span>
+              )}
+            </div>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
+              className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg border-2 border-background"
             >
-              <Camera className="h-3.5 w-3.5" />
+              <Camera className="h-4 w-4" />
             </button>
             <input
               ref={fileInputRef}
