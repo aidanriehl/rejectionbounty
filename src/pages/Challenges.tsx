@@ -178,7 +178,7 @@ export default function Challenges() {
         ) : (
           <button
             onClick={() => setShowPremiumGate(true)}
-            className="mb-5 w-full overflow-hidden rounded-xl bg-foreground p-4 text-background text-left"
+            className="mb-5 w-full rounded-xl bg-foreground p-4 text-background text-left"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, Camera, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, Camera, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import AvatarPicker from "@/components/AvatarPicker";
 import { type AvatarType } from "@/lib/mock-data";
@@ -31,7 +31,7 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains("dark"));
+  
 
   // Stripe Connect state
   const [connectStatus, setConnectStatus] = useState<{
@@ -274,28 +274,6 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* Dark Mode */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-3">
-              {darkMode ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
-              <div>
-                <span className="text-sm font-medium text-foreground">Dark Mode</span>
-                <p className="text-xs text-muted-foreground">{darkMode ? "Night theme active" : "Switch to light theme"}</p>
-              </div>
-            </div>
-            <Switch
-              checked={darkMode}
-              onCheckedChange={(checked) => {
-                setDarkMode(checked);
-                if (checked) {
-                  document.documentElement.classList.add("dark");
-                } else {
-                  document.documentElement.classList.remove("dark");
-                }
-                localStorage.setItem("theme", checked ? "dark" : "light");
-              }}
-            />
-          </div>
         </div>
 
         {/* Payouts Section */}
