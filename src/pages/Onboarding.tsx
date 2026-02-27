@@ -8,7 +8,7 @@ const SPLASH_DURATION = 2200;
 
 const SLIDES = [
   {
-    tag: "WHAT IS DAILY REJECTION?",
+    tag: "WHAT IS REJECTION BOUNTY?",
     title: "Face your fears and win real cash prizes",
     description:
       "Complete rejection challenges each week to stay in the game and split the prize pool with other players.",
@@ -48,7 +48,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       >
         <span className="text-7xl">🔥</span>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
-          Daily Rejection
+          Rejection Bounty
         </h1>
       </motion.div>
     </motion.div>
