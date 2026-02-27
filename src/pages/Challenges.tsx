@@ -131,7 +131,7 @@ export default function Challenges() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Subscriber Count</p>
-                <p className="text-xs text-muted-foreground">Subscribe to unlock</p>
+                <p className="text-xs text-muted-foreground">Every subscriber increases prize pool by $3.12</p>
               </div>
               <Crown className="ml-auto h-4 w-4 text-primary" />
             </div>
@@ -171,7 +171,7 @@ export default function Challenges() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Weekly Prize Pool</p>
-                <p className="text-xs text-muted-foreground">Compete & win cash every week</p>
+                <p className="text-xs text-muted-foreground">Compete for cash every week</p>
               </div>
               <Crown className="ml-auto h-4 w-4 text-primary" />
             </div>
