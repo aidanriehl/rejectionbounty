@@ -256,15 +256,16 @@ export default function Challenges() {
                     {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
                     onClick={() => isPremium ? setChoiceChallenge(challenge) : triggerSubscribe()}
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors relative",
+                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
                       challenge.completed
                         ? "bg-primary/10 text-primary"
                         : "bg-muted text-muted-foreground"
                     )}
                   >
-                    <Upload className="h-3.5 w-3.5" />
-                    {!isPremium && (
-                      <Crown className="absolute -top-1 -right-1 h-3 w-3 text-foreground/40" />
+                    {isPremium ? (
+                      <Upload className="h-3.5 w-3.5" />
+                    ) : (
+                      <Crown className="h-3.5 w-3.5" />
                     )}
                   </button>
                 </motion.div>
