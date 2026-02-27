@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clock, Crown, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
+import { Check, Crown, Trophy, Upload, Users, Video, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockChallenges, getCompletedCount, getTimeUntilSunday, getCurrentWeekKey, type Challenge } from "@/lib/mock-data";
-import { Progress } from "@/components/ui/progress";
 import { fireConfetti, fireBigConfetti, fireEpicConfetti } from "@/lib/confetti";
 import { playPop, playBigWin, playEpicWin, playCascade } from "@/lib/sounds";
 import { toast } from "@/hooks/use-toast";
@@ -26,6 +25,19 @@ const progressMessages: Record<number, string> = {
   10: "🏆 LEGEND!",
 };
 
+function CountdownDigit({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="text-2xl font-extrabold text-foreground tabular-nums leading-none">
+        {String(value).padStart(2, "0")}
+      </span>
+      <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export default function Challenges() {
   const navigate = useNavigate();
   const weekKey = getCurrentWeekKey();
@@ -37,11 +49,16 @@ export default function Challenges() {
   const [cameraChallenge, setCameraChallenge] = useState<Challenge | null>(null);
   const [showPremiumGate, setShowPremiumGate] = useState(false);
   const [pendingUncheck, setPendingUncheck] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(getTimeUntilSunday);
 
-  // TODO: Replace with real subscription check from Apple IAP
+  // Live countdown tick
+  useEffect(() => {
+    const timer = setInterval(() => setCountdown(getTimeUntilSunday()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const isPremium = false;
   const completed = getCompletedCount(challenges);
-  const { days, hours } = getTimeUntilSunday();
   const prizePool = 1247;
   const subscribers = 1832;
 
@@ -56,12 +73,10 @@ export default function Challenges() {
   const handleChallengeClick = (id: string) => {
     const challenge = challenges.find((c) => c.id === id);
     if (!challenge) return;
-
     if (challenge.completed) {
       setPendingUncheck(id);
       return;
     }
-
     doToggle(id);
   };
 
@@ -69,11 +84,9 @@ export default function Challenges() {
     setChallenges((prev) => {
       const challenge = prev.find((c) => c.id === id);
       if (!challenge) return prev;
-
       const next = prev.map((c) =>
         c.id === id ? { ...c, completed: !c.completed } : c
       );
-
       if (!challenge.completed) {
         const newCount = getCompletedCount(next);
         if (newCount === 10) {
@@ -90,11 +103,11 @@ export default function Challenges() {
           if (navigator.vibrate) navigator.vibrate(50);
         }
       }
-
       return next;
     });
   };
 
+  const progressPct = Math.min((completed / 5) * 100, 100);
 
   return (
     <>
@@ -104,302 +117,296 @@ export default function Challenges() {
       <AnimatePresence>
         {summaryDone && !dropRevealed && <DropReveal onRevealComplete={handleRevealComplete} />}
       </AnimatePresence>
-    <div className="min-h-screen pb-24 pt-10">
-      <div className="mx-auto max-w-lg px-4">
-        {/* Header */}
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-foreground">This Week's Drop</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Resets every Sunday</p>
-        </div>
 
-        {/* Subscriber Card + Prize Pool wrapper for tour */}
-        <div data-tour="prize-pool">
-        {isPremium ? (
-          <div className="mb-3 overflow-hidden rounded-xl bg-foreground p-4 text-background">
+      <div className="min-h-screen pb-24 pt-6">
+        <div className="mx-auto max-w-lg px-4">
+
+          {/* Countdown Card */}
+          <div className="mb-4 rounded-2xl border-2 border-foreground bg-card p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                  <Users className="h-5 w-5" />
-                </div>
+                <span className="text-2xl">🎯</span>
                 <div>
-                  <p className="text-xs font-medium opacity-60">Subscribers</p>
-                  <p className="text-2xl font-bold">{subscribers.toLocaleString()}</p>
+                  <p className="text-sm font-bold text-foreground leading-tight">This Week's Drop</p>
+                  <p className="text-xs text-muted-foreground">Resets Sunday</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs opacity-60 leading-tight">Monthly pool increases</p>
-                <p className="text-xs opacity-60 leading-tight">per subscriber</p>
-                <p className="text-lg font-bold">+$3.12</p>
+              <div className="flex items-center gap-3">
+                <CountdownDigit value={countdown.days} label="Days" />
+                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
+                <CountdownDigit value={countdown.hours} label="Hours" />
+                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
+                <CountdownDigit value={countdown.minutes} label="Min" />
+                <span className="text-lg font-bold text-muted-foreground/40 -mt-3">:</span>
+                <CountdownDigit value={countdown.seconds} label="Sec" />
               </div>
             </div>
           </div>
-        ) : (
-          <button
-            onClick={() => setShowPremiumGate(true)}
-            className="mb-3 w-full overflow-hidden rounded-xl bg-foreground p-4 text-background text-left"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                  <Users className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium opacity-60">Subscribers</p>
-                  <div className="h-8"><p className="text-2xl font-bold blur-md select-none">1,832</p></div>
-                </div>
-              </div>
-              <Crown className="h-5 w-5 opacity-40" />
-            </div>
-          </button>
-        )}
 
-        {/* Prize Pool Card */}
-        {isPremium ? (
-          <div className="mb-5 overflow-hidden rounded-xl bg-foreground p-4 text-background">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                  <Trophy className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
-                  <p className="text-2xl font-bold">${prizePool.toLocaleString()}</p>
-                </div>
+          {/* Premium Cards */}
+          <div data-tour="prize-pool" className="flex gap-3 mb-5">
+            {/* Subscribers */}
+            {isPremium ? (
+              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background">
+                <Users className="h-4 w-4 opacity-50 mb-2" />
+                <p className="text-2xl font-extrabold">{subscribers.toLocaleString()}</p>
+                <p className="text-[11px] font-medium opacity-50">Subscribers</p>
               </div>
-              <div className="text-right">
-                <div className="flex items-center gap-1 text-xs opacity-60">
-                  <Clock className="h-3 w-3" />
-                  <span>Resets in</span>
-                </div>
-                <p className="text-lg font-bold">{days}d {hours}h</p>
+            ) : (
+              <button
+                onClick={() => setShowPremiumGate(true)}
+                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative"
+              >
+                <Users className="h-4 w-4 opacity-50 mb-2" />
+                <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
+                <p className="text-[11px] font-medium opacity-50">Subscribers</p>
+                <Crown className="absolute top-3 right-3 h-4 w-4 opacity-30" />
+              </button>
+            )}
+
+            {/* Prize Pool */}
+            {isPremium ? (
+              <div className="flex-1 rounded-2xl bg-foreground p-4 text-background">
+                <Trophy className="h-4 w-4 opacity-50 mb-2" />
+                <p className="text-2xl font-extrabold">${prizePool.toLocaleString()}</p>
+                <p className="text-[11px] font-medium opacity-50">Prize Pool</p>
               </div>
-            </div>
+            ) : (
+              <button
+                onClick={() => setShowPremiumGate(true)}
+                className="flex-1 rounded-2xl bg-foreground p-4 text-background text-left relative"
+              >
+                <Trophy className="h-4 w-4 opacity-50 mb-2" />
+                <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
+                <p className="text-[11px] font-medium opacity-50">Prize Pool</p>
+                <Crown className="absolute top-3 right-3 h-4 w-4 opacity-30" />
+              </button>
+            )}
           </div>
-        ) : (
-          <button
-            onClick={() => setShowPremiumGate(true)}
-            className="mb-5 w-full rounded-xl bg-foreground p-4 text-background text-left"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/10">
-                  <Trophy className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium opacity-60">Weekly Prize Pool</p>
-                  <div className="h-8"><p className="text-2xl font-bold blur-md select-none">$1,247</p></div>
-                </div>
-              </div>
-              <Crown className="h-5 w-5 opacity-40" />
+
+          {/* Progress */}
+          <div className="mb-5">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-bold text-foreground">
+                {completed}/5 completed
+              </span>
+              <span className="text-xs font-semibold text-primary">
+                {progressMessages[completed] || ""}
+              </span>
             </div>
-          </button>
-        )}
-        </div>{/* end data-tour="prize-pool" */}
-
-        {/* Progress */}
-        <div className="mb-5">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">Progress</span>
-            <span className="text-sm font-semibold text-primary">
-              {completed}/5 {progressMessages[completed] || ""}
-            </span>
-          </div>
-          <Progress value={Math.min((completed / 5) * 100, 100)} className="h-2 bg-muted" />
-        </div>
-
-        {/* Challenge List */}
-        <p className="mb-2 text-sm font-semibold text-foreground">Complete 5 challenges of these 10</p>
-        <div data-tour="challenge-list" className="overflow-hidden rounded-xl border bg-card">
-          <AnimatePresence>
-            {challenges.map((challenge, i) => (
+            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
               <motion.div
-                key={challenge.id}
-                initial={justRevealed ? { opacity: 0, y: -200, scale: 0.6, rotate: -8 } : false}
-                animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
-                transition={justRevealed
-                  ? { delay: i * 0.12, type: "spring", stiffness: 300, damping: 18 }
-                  : { duration: 0 }
-                }
-                className={cn(
-                  "group flex items-center gap-3 px-4 py-3 transition-all",
-                  i !== challenges.length - 1 && "border-b",
-                  challenge.completed && "bg-success/5"
-                )}
-              >
-                {/* Number — tap to toggle */}
-                <button
-                  onClick={() => handleChallengeClick(challenge.id)}
+                className="h-full rounded-full bg-primary"
+                initial={false}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              />
+            </div>
+          </div>
+
+          {/* Challenge List */}
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Complete 5 of 10 challenges
+          </p>
+          <div data-tour="challenge-list" className="space-y-2">
+            <AnimatePresence>
+              {challenges.map((challenge, i) => (
+                <motion.div
+                  key={challenge.id}
+                  initial={justRevealed ? { opacity: 0, y: -200, scale: 0.6, rotate: -8 } : false}
+                  animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
+                  transition={justRevealed
+                    ? { delay: i * 0.12, type: "spring", stiffness: 300, damping: 18 }
+                    : { duration: 0 }
+                  }
                   className={cn(
-                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    "group flex items-center gap-3 rounded-xl border px-4 py-3.5 transition-all",
                     challenge.completed
-                      ? "bg-success text-success-foreground"
-                      : "bg-muted text-muted-foreground"
+                      ? "border-primary/20 bg-primary/5"
+                      : "border-border bg-card"
                   )}
                 >
-                  {challenge.completed ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
-                </button>
+                  {/* Checkbox */}
+                  <button
+                    onClick={() => handleChallengeClick(challenge.id)}
+                    className={cn(
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all",
+                      challenge.completed
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "border-2 border-muted-foreground/30 text-muted-foreground"
+                    )}
+                  >
+                    {challenge.completed ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
+                  </button>
 
-                {/* Title — tap row to toggle */}
-                <button
-                  onClick={() => handleChallengeClick(challenge.id)}
-                  className={cn(
-                    "flex-1 text-left text-sm font-medium text-foreground",
-                    challenge.completed && "line-through opacity-50"
-                  )}
-                >
-                  {challenge.title} {challenge.emoji}
-                </button>
+                  {/* Title */}
+                  <button
+                    onClick={() => handleChallengeClick(challenge.id)}
+                    className={cn(
+                      "flex-1 text-left text-sm font-medium",
+                      challenge.completed
+                        ? "text-muted-foreground line-through"
+                        : "text-foreground"
+                    )}
+                  >
+                    <span className="mr-1.5">{challenge.emoji}</span>
+                    {challenge.title}
+                  </button>
 
-                {/* Upload button — always visible */}
-                <button
-                  {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
-                  onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
-                  className="flex h-7 items-center gap-1 rounded-full bg-primary/10 px-2.5 text-xs font-medium text-primary"
-                >
-                  <Upload className="h-3 w-3" />
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  {/* Upload */}
+                  <button
+                    {...(i === 0 ? { "data-tour": "upload-btn" } : {})}
+                    onClick={() => isPremium ? setChoiceChallenge(challenge) : setShowPremiumGate(true)}
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                      challenge.completed
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                  </button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
 
-      {/* Choice modal: Record or Upload */}
-      <AnimatePresence>
-        {choiceChallenge && !cameraChallenge && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setChoiceChallenge(null)}
-          >
+        {/* Choice modal: Record or Upload */}
+        <AnimatePresence>
+          {choiceChallenge && !cameraChallenge && (
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg rounded-t-2xl bg-card p-5 pb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm"
+              onClick={() => setChoiceChallenge(null)}
             >
-              <p className="mb-1 text-lg font-bold text-foreground">Add Accountability Video</p>
-              <p className="mb-5 text-sm text-muted-foreground">{choiceChallenge.title}</p>
-
-              <button
-                onClick={() => {
-                  setCameraChallenge(choiceChallenge);
-                  setChoiceChallenge(null);
-                }}
-                className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-lg rounded-t-2xl bg-card p-5 pb-8"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                  <Video className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Record Now</p>
-                  <p className="text-xs text-muted-foreground">Film directly in the app</p>
-                </div>
-              </button>
+                <p className="mb-1 text-lg font-bold text-foreground">Add Accountability Video</p>
+                <p className="mb-5 text-sm text-muted-foreground">{choiceChallenge.title}</p>
 
-              <button
-                onClick={() => {
-                  setChoiceChallenge(null);
-                  navigate("/post", { state: { challengeTitle: choiceChallenge.title } });
-                }}
-                className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                  <FolderOpen className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Upload from Library</p>
-                  <p className="text-xs text-muted-foreground">Choose a video from your camera roll</p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setChoiceChallenge(null)}
-                className="mt-1 w-full py-2 text-sm text-muted-foreground"
-              >
-                Cancel
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Full-screen camera recorder */}
-      <AnimatePresence>
-        {cameraChallenge && (
-          <CameraRecorder
-            challengeTitle={cameraChallenge.title}
-            onClose={() => setCameraChallenge(null)}
-            onRecorded={(file) => {
-              doToggle(cameraChallenge.id);
-              setCameraChallenge(null);
-              
-              navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Undo confirmation — iOS low battery style */}
-      <AnimatePresence>
-        {pendingUncheck && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setPendingUncheck(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.85 }}
-              transition={{ type: "spring", damping: 25, stiffness: 400 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-72 overflow-hidden rounded-2xl bg-card shadow-xl"
-            >
-              <div className="px-6 pt-6 pb-4 text-center">
-                <p className="text-base font-semibold text-foreground">Undo this challenge?</p>
-                <p className="mt-1.5 text-sm text-muted-foreground">
-                  Click this by accident?
-                </p>
-              </div>
-              <div className="border-t border-border flex">
                 <button
-                  onClick={() => setPendingUncheck(null)}
-                  className="flex-1 py-3 text-sm font-medium text-primary border-r border-border"
+                  onClick={() => {
+                    setCameraChallenge(choiceChallenge);
+                    setChoiceChallenge(null);
+                  }}
+                  className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <Video className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Record Now</p>
+                    <p className="text-xs text-muted-foreground">Film directly in the app</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setChoiceChallenge(null);
+                    navigate("/post", { state: { challengeTitle: choiceChallenge.title } });
+                  }}
+                  className="mb-3 flex w-full items-center gap-3 rounded-xl border bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-muted/50"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <FolderOpen className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Upload from Library</p>
+                    <p className="text-xs text-muted-foreground">Choose a video from your camera roll</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setChoiceChallenge(null)}
+                  className="mt-1 w-full py-2 text-sm text-muted-foreground"
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={() => {
-                    doToggle(pendingUncheck);
-                    setPendingUncheck(null);
-                  }}
-                  className="flex-1 py-3 text-sm font-semibold text-destructive"
-                >
-                  Yes, Undo
-                </button>
-              </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
 
-      {/* Premium gate modal */}
-      <PremiumGate
-        open={showPremiumGate}
-        onClose={() => setShowPremiumGate(false)}
-        onSubscribe={() => {
-          setShowPremiumGate(false);
-          toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
-        }}
-      />
-    </div>
+        {/* Full-screen camera recorder */}
+        <AnimatePresence>
+          {cameraChallenge && (
+            <CameraRecorder
+              challengeTitle={cameraChallenge.title}
+              onClose={() => setCameraChallenge(null)}
+              onRecorded={(file) => {
+                doToggle(cameraChallenge.id);
+                setCameraChallenge(null);
+                navigate("/post", { state: { challengeTitle: cameraChallenge.title, recordedFile: file.name } });
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Undo confirmation */}
+        <AnimatePresence>
+          {pendingUncheck && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              onClick={() => setPendingUncheck(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.85 }}
+                transition={{ type: "spring", damping: 25, stiffness: 400 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-72 overflow-hidden rounded-2xl bg-card shadow-xl"
+              >
+                <div className="px-6 pt-6 pb-4 text-center">
+                  <p className="text-base font-semibold text-foreground">Undo this challenge?</p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">
+                    Click this by accident?
+                  </p>
+                </div>
+                <div className="border-t border-border flex">
+                  <button
+                    onClick={() => setPendingUncheck(null)}
+                    className="flex-1 py-3 text-sm font-medium text-primary border-r border-border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      doToggle(pendingUncheck);
+                      setPendingUncheck(null);
+                    }}
+                    className="flex-1 py-3 text-sm font-semibold text-destructive"
+                  >
+                    Yes, Undo
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Premium gate modal */}
+        <PremiumGate
+          open={showPremiumGate}
+          onClose={() => setShowPremiumGate(false)}
+          onSubscribe={() => {
+            setShowPremiumGate(false);
+            toast({ title: "Coming soon!", description: "In-app purchases will be available soon." });
+          }}
+        />
+      </div>
     </>
   );
 }
