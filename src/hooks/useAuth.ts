@@ -9,6 +9,7 @@ export interface Profile {
   avatar_stage: number;
   streak: number;
   total_completed: number;
+  profile_photo_url: string | null;
   created_at: string;
 }
 

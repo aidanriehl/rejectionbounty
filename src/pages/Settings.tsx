@@ -154,7 +154,7 @@ export default function SettingsPage() {
             className="flex w-full items-center justify-between px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <AvatarDisplay avatar={(authProfile?.avatar || "dragon") as AvatarType} stage={(authProfile?.avatar_stage ?? 0) as any} size="sm" />
+              <AvatarDisplay avatar={(authProfile?.avatar || "dragon") as AvatarType} stage={(authProfile?.avatar_stage ?? 0) as any} size="sm" photoUrl={authProfile?.profile_photo_url} />
               <div className="text-left">
                 <span className="text-sm font-medium text-foreground">Character</span>
                 <p className="text-xs text-muted-foreground">Choose your avatar</p>

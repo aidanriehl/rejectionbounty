@@ -20,6 +20,7 @@ export type Database = {
           avatar_stage: number
           created_at: string
           id: string
+          profile_photo_url: string | null
           streak: number
           total_completed: number
           username: string | null
@@ -29,6 +30,7 @@ export type Database = {
           avatar_stage?: number
           created_at?: string
           id: string
+          profile_photo_url?: string | null
           streak?: number
           total_completed?: number
           username?: string | null
@@ -38,6 +40,7 @@ export type Database = {
           avatar_stage?: number
           created_at?: string
           id?: string
+          profile_photo_url?: string | null
           streak?: number
           total_completed?: number
           username?: string | null

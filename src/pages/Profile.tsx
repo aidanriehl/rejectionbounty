@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, ArrowLeft, Grid3X3 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Settings, Grid3X3, Camera } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { avatarLabels } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import type { AvatarType, AvatarStage } from "@/lib/mock-data";
 
 const MILESTONES = [10, 50, 100, 150, 200] as const;
@@ -55,8 +56,10 @@ function getMilestone(completed: number) {
 }
 
 export default function Profile() {
-  const { profile, loading } = useAuth();
+  const { user, profile, loading, setProfile } = useAuth();
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const username = profile?.username || "Username";
@@ -64,6 +67,63 @@ export default function Profile() {
   const avatarStage = (profile?.avatar_stage ?? 0) as AvatarStage;
   const streak = profile?.streak ?? 0;
   const totalCompleted = profile?.total_completed ?? 0;
+  const photoUrl = profile?.profile_photo_url ?? null;
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file", variant: "destructive" });
+      return;
+    }
+
+    // Max 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image must be under 5MB", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const filePath = `${user.id}/avatar.${ext}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      // Add cache buster
+      const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ profile_photo_url: urlWithBuster })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile!, profile_photo_url: urlWithBuster });
+      toast({ title: "Profile photo updated!" });
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast({ title: "Failed to upload photo", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      // Reset input so same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   if (loading) {
     return (
@@ -87,10 +147,34 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Avatar */}
+        {/* Avatar with photo upload */}
         <div className="mb-5 flex flex-col items-center">
-          <AvatarDisplay avatar={avatar} stage={avatarStage} size="lg" />
-          <p className="mt-1 text-[10px] text-muted-foreground">{avatarLabels[avatarStage]}</p>
+          <div className="relative">
+            <AvatarDisplay
+              avatar={avatar}
+              stage={avatarStage}
+              size="lg"
+              photoUrl={photoUrl}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="user"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+          </div>
+          {uploading && (
+            <p className="mt-1 text-[10px] text-muted-foreground">Uploading…</p>
+          )}
         </div>
 
         {/* Streak Card */}
