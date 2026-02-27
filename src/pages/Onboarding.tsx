@@ -36,7 +36,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: "#6C3CE1" }}
+      style={{ backgroundColor: "hsl(var(--primary))" }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
