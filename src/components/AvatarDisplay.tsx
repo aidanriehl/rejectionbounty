@@ -1,6 +1,15 @@
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { avatarEmojis, type AvatarType, type AvatarStage } from "@/lib/mock-data";
+import { type AvatarType, type AvatarStage } from "@/lib/mock-data";
 import { Plus, Camera } from "lucide-react";
+
+// Relevant avatar-style emojis for random fallback (people, animals, plants)
+const FALLBACK_EMOJIS = [
+  "🐶", "🐱", "🐻", "🦊", "🐼", "🐨", "🐯", "🦁",
+  "🐸", "🐵", "🐔", "🐧", "🐦", "🦉", "🦄", "🐢",
+  "🐙", "🦋", "🌵", "🌻", "🌸", "🍄", "🌿", "🐲",
+  "🐰", "🐷", "🐺", "🦎", "🐠", "🦈", "🦩", "🦜",
+];
 
 interface AvatarDisplayProps {
   avatar: AvatarType;
@@ -37,7 +46,16 @@ export default function AvatarDisplay({
   onEditPhoto,
   className,
 }: AvatarDisplayProps) {
-  const emoji = avatarEmojis[avatar]?.[stage] ?? "🐉";
+  // Stable random emoji per avatar type (deterministic)
+  const emoji = useMemo(() => {
+    // Simple hash from avatar string to pick a consistent emoji
+    let hash = 0;
+    for (let i = 0; i < avatar.length; i++) {
+      hash = ((hash << 5) - hash) + avatar.charCodeAt(i);
+      hash |= 0;
+    }
+    return FALLBACK_EMOJIS[Math.abs(hash) % FALLBACK_EMOJIS.length];
+  }, [avatar]);
 
   return (
     <div className="relative inline-flex">

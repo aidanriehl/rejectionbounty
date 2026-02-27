@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Globe, Lock, LogOut, ChevronRight, User, Camera, KeyRound, Bell, CircleHelp, FileText, Trash2, Banknote, CheckCircle, Loader2 } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import AvatarPicker from "@/components/AvatarPicker";
 import { type AvatarType } from "@/lib/mock-data";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
@@ -27,7 +26,6 @@ export default function SettingsPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(authProfile?.username || "");
   const [isPublic, setIsPublic] = useState(true);
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -203,35 +201,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Avatar Section */}
-        <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Avatar</p>
-        <div className="mb-5 overflow-hidden rounded-xl border bg-card">
-          <button
-            onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-            className="flex w-full items-center justify-between px-4 py-3"
-          >
-            <div className="flex items-center gap-3">
-              <AvatarDisplay avatar={(authProfile?.avatar || "dragon") as AvatarType} stage={(authProfile?.avatar_stage ?? 0) as any} size="sm" photoUrl={authProfile?.profile_photo_url} />
-              <div className="text-left">
-                <span className="text-sm font-medium text-foreground">Character</span>
-                <p className="text-xs text-muted-foreground">Choose your avatar</p>
-              </div>
-            </div>
-            <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${showAvatarPicker ? "rotate-90" : ""}`} />
-          </button>
-          {showAvatarPicker && (
-            <div className="border-t px-4 py-3">
-              <AvatarPicker
-                selected={(authProfile?.avatar || "dragon") as AvatarType}
-                onSelect={async (avatar: AvatarType) => {
-                  if (!user) return;
-                  await supabase.from("profiles").update({ avatar }).eq("id", user.id);
-                  setAuthProfile({ ...authProfile!, avatar });
-                }}
-              />
-            </div>
-          )}
-        </div>
 
         {/* Preferences Section */}
         <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
