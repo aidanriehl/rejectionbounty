@@ -63,8 +63,6 @@ export default function Challenges() {
     }
 
     doToggle(id);
-
-    doToggle(id);
   };
 
   const doToggle = (id: string) => {
