@@ -188,7 +188,7 @@ export default function SettingsPage() {
               disabled={uploading}
               className="flex items-center gap-1 text-sm text-muted-foreground"
             >
-              {uploading ? "Uploading…" : "Change"}
+              {uploading ? "Uploading…" : "Edit"}
               <ChevronRight className="h-4 w-4" />
             </button>
             <input
