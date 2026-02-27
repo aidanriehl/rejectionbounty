@@ -1,13 +1,16 @@
 import { cn } from "@/lib/utils";
 import { avatarEmojis, type AvatarType, type AvatarStage } from "@/lib/mock-data";
-import { Plus } from "lucide-react";
+import { Plus, Camera } from "lucide-react";
 
 interface AvatarDisplayProps {
   avatar: AvatarType;
   stage: AvatarStage;
   size?: "sm" | "md" | "lg";
+  photoUrl?: string | null;
   showAddFriend?: boolean;
   onAddFriend?: () => void;
+  showEditOverlay?: boolean;
+  onEditPhoto?: () => void;
   className?: string;
 }
 
@@ -17,29 +20,56 @@ const sizeClasses = {
   lg: "h-20 w-20 text-3xl",
 };
 
-const stageBorders: Record<AvatarStage, string> = {
-  0: "ring-2 ring-muted-foreground/30",
-  1: "ring-2 ring-border",
-  2: "ring-2 ring-primary/50",
-  3: "ring-2 ring-prize shadow-sm",
+const ringClasses = {
+  sm: "ring-[1.5px]",
+  md: "ring-2",
+  lg: "ring-[2.5px]",
 };
 
-export default function AvatarDisplay({ avatar, stage, size = "md", showAddFriend, onAddFriend, className }: AvatarDisplayProps) {
+export default function AvatarDisplay({
+  avatar,
+  stage,
+  size = "md",
+  photoUrl,
+  showAddFriend,
+  onAddFriend,
+  showEditOverlay,
+  onEditPhoto,
+  className,
+}: AvatarDisplayProps) {
   const emoji = avatarEmojis[avatar]?.[stage] ?? "🐉";
 
   return (
     <div className="relative inline-flex">
       <div
         className={cn(
-          "flex items-center justify-center rounded-full bg-muted",
+          "flex items-center justify-center rounded-full overflow-hidden bg-muted",
           sizeClasses[size],
-          stageBorders[stage],
-          stage === 3 && "bg-prize/10",
+          ringClasses[size],
+          "ring-border",
           className
         )}
       >
-        <span>{emoji}</span>
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt="Profile"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span>{emoji}</span>
+        )}
       </div>
+
+      {showEditOverlay && (
+        <button
+          onClick={onEditPhoto}
+          className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white transition-opacity"
+        >
+          <Camera className="h-5 w-5" />
+        </button>
+      )}
+
       {showAddFriend && (
         <button
           onClick={onAddFriend}
