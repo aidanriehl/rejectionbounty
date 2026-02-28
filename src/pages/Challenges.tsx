@@ -145,7 +145,7 @@ export default function Challenges() {
           <div data-tour="prize-pool" className="flex gap-3 mb-5">
             {/* Subscribers */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground">
+              <div className="flex-1 rounded-2xl p-4 text-foreground" style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}>
                 <Users className="h-4 w-4 text-primary mb-2" />
                 <p className="text-2xl font-extrabold">{subscribers.toLocaleString()}</p>
                 <p className="text-[11px] font-medium text-muted-foreground">Subscribers</p>
@@ -153,7 +153,8 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl p-4 text-foreground text-left relative"
+                style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}
               >
                 <Users className="h-4 w-4 text-primary mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
@@ -164,7 +165,7 @@ export default function Challenges() {
 
             {/* Prize Pool */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground">
+              <div className="flex-1 rounded-2xl p-4 text-foreground" style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}>
                 <Trophy className="h-4 w-4 text-primary mb-2" />
                 <p className="text-2xl font-extrabold">${prizePool.toLocaleString()}</p>
                 <p className="text-[11px] font-medium text-muted-foreground">Prize Pool</p>
@@ -172,7 +173,8 @@ export default function Challenges() {
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl bg-primary/20 border border-primary/30 p-4 text-foreground text-left relative"
+                className="flex-1 rounded-2xl p-4 text-foreground text-left relative"
+                style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}
               >
                 <Trophy className="h-4 w-4 text-primary mb-2" />
                 <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
