@@ -145,41 +145,45 @@ export default function Challenges() {
           <div data-tour="prize-pool" className="flex gap-3 mb-5">
             {/* Subscribers */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl p-4 text-foreground" style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}>
-                <Users className="h-4 w-4 text-primary mb-2" />
-                <p className="text-2xl font-extrabold">{subscribers.toLocaleString()}</p>
-                <p className="text-[11px] font-medium text-muted-foreground">Subscribers</p>
+              <div className="flex-1 rounded-2xl p-5 text-primary-foreground relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(164 72% 40%), hsl(164 72% 32%))' }}>
+                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-10" style={{ backgroundColor: 'white' }} />
+                <Users className="h-5 w-5 text-primary-foreground/70 mb-3" />
+                <p className="text-3xl font-extrabold tracking-tight">{subscribers.toLocaleString()}</p>
+                <p className="text-xs font-semibold text-primary-foreground/60 mt-1">Subscribers</p>
               </div>
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl p-4 text-foreground text-left relative"
-                style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}
+                className="flex-1 rounded-2xl p-5 text-primary-foreground text-left relative overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, hsl(164 72% 40%), hsl(164 72% 32%))' }}
               >
-                <Users className="h-4 w-4 text-primary mb-2" />
-                <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">1,832</p></div>
-                <p className="text-[11px] font-medium text-muted-foreground">Subscribers</p>
-                <Crown className="absolute top-3 right-3 h-4 w-4 text-primary/30" />
+                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-10" style={{ backgroundColor: 'white' }} />
+                <Users className="h-5 w-5 text-primary-foreground/70 mb-3" />
+                <div className="h-9"><p className="text-3xl font-extrabold tracking-tight blur-md select-none">1,832</p></div>
+                <p className="text-xs font-semibold text-primary-foreground/60 mt-1">Subscribers</p>
+                <Crown className="absolute top-4 right-4 h-4 w-4 text-primary-foreground/30" />
               </button>
             )}
 
             {/* Prize Pool */}
             {isPremium ? (
-              <div className="flex-1 rounded-2xl p-4 text-foreground" style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}>
-                <Trophy className="h-4 w-4 text-primary mb-2" />
-                <p className="text-2xl font-extrabold">${prizePool.toLocaleString()}</p>
-                <p className="text-[11px] font-medium text-muted-foreground">Prize Pool</p>
+              <div className="flex-1 rounded-2xl p-5 text-foreground relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(45 93% 52%), hsl(38 90% 46%))' }}>
+                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-15" style={{ backgroundColor: 'white' }} />
+                <Trophy className="h-5 w-5 text-foreground/60 mb-3" />
+                <p className="text-3xl font-extrabold tracking-tight">${prizePool.toLocaleString()}</p>
+                <p className="text-xs font-semibold text-foreground/50 mt-1">Prize Pool</p>
               </div>
             ) : (
               <button
                 onClick={triggerSubscribe}
-                className="flex-1 rounded-2xl p-4 text-foreground text-left relative"
-                style={{ backgroundColor: 'hsl(164 72% 92%)', borderWidth: 1, borderColor: 'hsl(164 72% 80%)' }}
+                className="flex-1 rounded-2xl p-5 text-foreground text-left relative overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, hsl(45 93% 52%), hsl(38 90% 46%))' }}
               >
-                <Trophy className="h-4 w-4 text-primary mb-2" />
-                <div className="h-8"><p className="text-2xl font-extrabold blur-md select-none">$1,247</p></div>
-                <p className="text-[11px] font-medium text-muted-foreground">Prize Pool</p>
-                <Crown className="absolute top-3 right-3 h-4 w-4 text-primary/30" />
+                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-15" style={{ backgroundColor: 'white' }} />
+                <Trophy className="h-5 w-5 text-foreground/60 mb-3" />
+                <div className="h-9"><p className="text-3xl font-extrabold tracking-tight blur-md select-none">$1,247</p></div>
+                <p className="text-xs font-semibold text-foreground/50 mt-1">Prize Pool</p>
+                <Crown className="absolute top-4 right-4 h-4 w-4 text-foreground/30" />
               </button>
             )}
           </div>
