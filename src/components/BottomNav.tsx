@@ -16,8 +16,8 @@ export default function BottomNav() {
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50",
       location.pathname === "/"
-        ? "bg-black/80 backdrop-blur-lg"
-        : "bg-card/95 backdrop-blur-lg border-t border-border"
+        ? "bg-black"
+        : "bg-card border-t border-border"
     )}>
       <div className="mx-auto flex max-w-lg items-center justify-around py-3">
         {tabs.map((tab) => {
