@@ -218,7 +218,7 @@ export default function Profile() {
               <span className="text-3xl font-extrabold text-foreground leading-none">{streak}</span>
               <span className="text-lg font-semibold text-foreground leading-none">Day Streak</span>
             </div>
-            <p className="text-[10px] text-muted-foreground/50 mt-1.5">best streak: {streak}</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1.5">Best Streak: {streak}</p>
           </div>
 
           {/* Challenges */}
@@ -228,7 +228,7 @@ export default function Profile() {
               <span className="text-3xl font-extrabold text-foreground leading-none">{totalCompleted}/{ms.goal}</span>
               <span className="text-lg font-semibold text-foreground leading-none">Challenges Completed</span>
             </div>
-            <p className="text-[10px] text-muted-foreground/50 mt-1.5">{totalCompleted >= 5 ? Math.round((Math.floor(totalCompleted / 5) / 52) * 100) : 0}% weeks completed</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1.5">{totalCompleted >= 5 ? Math.round((Math.floor(totalCompleted / 5) / 52) * 100) : 0}% Weeks Completed</p>
           </div>
         </div>
 
