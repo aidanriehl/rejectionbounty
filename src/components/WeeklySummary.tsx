@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
-import { Trophy, ChevronUp, Crown, Skull } from "lucide-react";
+import { Trophy, ChevronUp, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import type { AvatarType, AvatarStage } from "@/lib/mock-data";
@@ -11,14 +11,6 @@ interface ChallengeResult {
   completedBy: number;
   totalUsers: number;
   takeRate: number;
-}
-
-interface UserResult {
-  username: string;
-  avatar: AvatarType;
-  avatarStage: AvatarStage;
-  completed: number;
-  isYou?: boolean;
 }
 
 interface WeeklySummaryProps {
@@ -35,28 +27,19 @@ const mockChallengeResults: ChallengeResult[] = [
   { title: "Ask for a free coffee", emoji: "☕", completedBy: 498, totalUsers: 1832, takeRate: 27.2 },
   { title: "Ask to cut in line", emoji: "🚶", completedBy: 345, totalUsers: 1832, takeRate: 18.8 },
   { title: "Ask for someone's number", emoji: "📱", completedBy: 234, totalUsers: 1832, takeRate: 12.8 },
-  { title: "Return food at a restaurant", emoji: "🍽️", completedBy: 189, totalUsers: 1832, takeRate: 10.3 },
-  { title: "Ask to use a stranger's phone", emoji: "☎️", completedBy: 112, totalUsers: 1832, takeRate: 6.1 },
 ];
 
-const mockTopUsers: UserResult[] = [
-  { username: "brave_sarah", avatar: "dragon", avatarStage: 3, completed: 10 },
-  { username: "rejection_king", avatar: "fox", avatarStage: 2, completed: 9 },
-  { username: "fearless_mike", avatar: "owl", avatarStage: 1, completed: 8 },
-  { username: "DailyRejecter", avatar: "dragon", avatarStage: 2, completed: 7, isYou: true },
-  { username: "courage_queen", avatar: "cat", avatarStage: 3, completed: 7 },
-  { username: "no_fear_nina", avatar: "tree", avatarStage: 0, completed: 3 },
-];
-
-const mockNoShows: UserResult[] = [
-  { username: "ghost_rider", avatar: "cat", avatarStage: 0, completed: 0 },
-  { username: "lazy_larry", avatar: "owl", avatarStage: 0, completed: 0 },
-  { username: "procrastinator", avatar: "tree", avatarStage: 0, completed: 0 },
+const mockTopVideos = [
+  { username: "brave_sarah", avatar: "dragon" as AvatarType, avatarStage: 3 as AvatarStage, challenge: "Ask a stranger for a high-five", emoji: "🖐️" },
+  { username: "rejection_king", avatar: "fox" as AvatarType, avatarStage: 2 as AvatarStage, challenge: "Sing in public for 10 seconds", emoji: "🎤" },
+  { username: "fearless_mike", avatar: "owl" as AvatarType, avatarStage: 1 as AvatarStage, challenge: "Dance in an elevator", emoji: "🕺" },
+  { username: "courage_queen", avatar: "cat" as AvatarType, avatarStage: 3 as AvatarStage, challenge: "Ask for someone's number", emoji: "📱" },
 ];
 
 const completedThreshold = 5;
 const totalQualified = 892;
 const totalUsers = 1832;
+const qualifiedPercent = Math.round((totalQualified / totalUsers) * 100);
 
 export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
   const [dismissed, setDismissed] = useState(false);
@@ -71,7 +54,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
     }
   };
 
-  const youQualified = mockTopUsers.some((u) => u.isYou && u.completed >= completedThreshold);
+  const youQualified = true;
 
   return (
     <AnimatePresence>
@@ -80,7 +63,15 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
           ref={containerRef}
           className="fixed inset-0 z-[60] flex flex-col overflow-y-auto"
           style={{
-            background: "linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(0 0% 4%) 40%)",
+            background: `linear-gradient(
+              135deg,
+              hsl(164 72% 92%) 0%,
+              hsl(180 40% 96%) 25%,
+              hsl(200 30% 95%) 50%,
+              hsl(164 50% 94%) 75%,
+              hsl(140 40% 95%) 100%
+            )`,
+            backgroundAttachment: "fixed",
             y,
             opacity,
           }}
@@ -96,7 +87,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
           {/* Header */}
           <div className="px-4 pt-12 pb-4 text-center">
             <motion.p
-              className="text-xs font-semibold tracking-widest uppercase text-primary-foreground/60"
+              className="text-xs font-semibold tracking-widest uppercase text-muted-foreground"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -104,7 +95,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
               Last Week's Recap
             </motion.p>
             <motion.h1
-              className="mt-2 text-3xl font-extrabold text-primary-foreground"
+              className="mt-2 text-3xl font-extrabold text-foreground"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, type: "spring" }}
@@ -115,43 +106,44 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
             {/* Qualified banner */}
             {youQualified && (
               <motion.div
-                className="mx-auto mt-4 flex items-center gap-2 rounded-full bg-success/20 px-4 py-2 w-fit"
+                className="mx-auto mt-4 flex items-center gap-2 rounded-full px-4 py-2 w-fit"
+                style={{ backgroundColor: 'hsl(164 72% 88%)' }}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, type: "spring" }}
               >
-                <Trophy className="h-4 w-4 text-success" />
-                <span className="text-sm font-bold text-success">You qualified for the prize pool!</span>
+                <Trophy className="h-4 w-4 text-primary" />
+                <span className="text-sm font-bold text-primary">You qualified for the prize pool!</span>
               </motion.div>
             )}
 
             <motion.p
-              className="mt-3 text-sm text-primary-foreground/50"
+              className="mt-3 text-sm text-muted-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
-              {totalQualified.toLocaleString()} / {totalUsers.toLocaleString()} users completed 5+ challenges
+              {qualifiedPercent}% of users completed 5+ challenges
             </motion.p>
           </div>
 
           {/* Challenge Take Rates */}
           <div className="px-4 mt-4">
             <motion.div
-              className="rounded-xl border border-border/20 bg-card/10 backdrop-blur-sm overflow-hidden"
+              className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="px-4 py-3 border-b border-border/10">
-                <h2 className="text-sm font-bold text-primary-foreground/80">Challenge Take Rates</h2>
+              <div className="px-4 py-3 border-b border-border">
+                <h2 className="text-sm font-bold text-foreground">Challenge Take Rates</h2>
               </div>
               {mockChallengeResults.map((challenge, i) => (
                 <motion.div
                   key={challenge.title}
                   className={cn(
                     "flex items-center gap-3 px-4 py-2.5",
-                    i !== mockChallengeResults.length - 1 && "border-b border-border/5"
+                    i !== mockChallengeResults.length - 1 && "border-b border-border/50"
                   )}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -159,8 +151,8 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
                 >
                   <span className="text-lg w-8 text-center">{challenge.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-primary-foreground/70 truncate">{challenge.title}</p>
-                    <div className="mt-1 h-1.5 rounded-full bg-primary-foreground/10 overflow-hidden">
+                    <p className="text-xs font-medium text-foreground/70 truncate">{challenge.title}</p>
+                    <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
                       <motion.div
                         className="h-full rounded-full"
                         style={{
@@ -176,7 +168,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
                       />
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-primary-foreground/60 w-12 text-right">
+                  <span className="text-xs font-bold text-muted-foreground w-12 text-right">
                     {challenge.takeRate}%
                   </span>
                 </motion.div>
@@ -184,80 +176,46 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
             </motion.div>
           </div>
 
-          {/* Leaderboard */}
-          <div className="px-4 mt-4">
+          {/* Top Videos Gallery */}
+          <div className="px-4 mt-4 mb-6">
             <motion.div
-              className="rounded-xl border border-border/20 bg-card/10 backdrop-blur-sm overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              <div className="px-4 py-3 border-b border-border/10">
-                <h2 className="text-sm font-bold text-primary-foreground/80 flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-prize" /> Top Performers
-                </h2>
+              <h2 className="text-sm font-bold text-foreground mb-3 px-1">🔥 Top Videos This Week</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {mockTopVideos.map((video, i) => (
+                  <motion.button
+                    key={video.username}
+                    className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden text-left"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9 + i * 0.1, type: "spring" }}
+                  >
+                    {/* Video thumbnail placeholder */}
+                    <div
+                      className="aspect-[4/5] relative flex items-center justify-center"
+                      style={{ backgroundColor: 'hsl(164 72% 92%)' }}
+                    >
+                      <span className="text-4xl">{video.emoji}</span>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+                          <Play className="h-4 w-4 text-foreground ml-0.5" fill="currentColor" />
+                        </div>
+                      </div>
+                    </div>
+                    {/* User info */}
+                    <div className="p-3 flex items-center gap-2">
+                      <AvatarDisplay avatar={video.avatar} stage={video.avatarStage} size="sm" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate">{video.username}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{video.challenge}</p>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
               </div>
-              {mockTopUsers.map((user, i) => (
-                <motion.div
-                  key={user.username}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-2.5",
-                    i !== mockTopUsers.length - 1 && "border-b border-border/5",
-                    user.isYou && "bg-primary/10"
-                  )}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 + i * 0.06 }}
-                >
-                  <span className="text-xs font-bold text-primary-foreground/40 w-5">#{i + 1}</span>
-                  <AvatarDisplay avatar={user.avatar} stage={user.avatarStage as AvatarStage} size="sm" />
-                  <span className={cn(
-                    "flex-1 text-sm font-medium text-primary-foreground/70",
-                    user.isYou && "text-primary font-bold"
-                  )}>
-                    {user.username} {user.isYou && "(you)"}
-                  </span>
-                  <span className={cn(
-                    "text-xs font-bold px-2 py-0.5 rounded-full",
-                    user.completed >= completedThreshold
-                      ? "bg-success/20 text-success"
-                      : "bg-destructive/20 text-destructive"
-                  )}>
-                    {user.completed}/10
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* No-shows */}
-          <div className="px-4 mt-4 mb-6">
-            <motion.div
-              className="rounded-xl border border-border/20 bg-card/10 backdrop-blur-sm overflow-hidden"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-            >
-              <div className="px-4 py-3 border-b border-border/10">
-                <h2 className="text-sm font-bold text-primary-foreground/80 flex items-center gap-2">
-                  <Skull className="h-4 w-4 text-destructive/70" /> Didn't show up
-                </h2>
-              </div>
-              {mockNoShows.map((user, i) => (
-                <div
-                  key={user.username}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-2.5",
-                    i !== mockNoShows.length - 1 && "border-b border-border/5"
-                  )}
-                >
-                  <AvatarDisplay avatar={user.avatar} stage={user.avatarStage as AvatarStage} size="sm" />
-                  <span className="flex-1 text-sm font-medium text-primary-foreground/40">
-                    {user.username}
-                  </span>
-                  <span className="text-xs font-bold text-destructive/50">0/10</span>
-                </div>
-              ))}
             </motion.div>
           </div>
 
@@ -265,13 +223,13 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
           <motion.div
             className="sticky bottom-0 pb-8 pt-4 flex flex-col items-center"
             style={{
-              background: "linear-gradient(0deg, hsl(0 0% 4%) 60%, transparent 100%)",
+              background: "linear-gradient(0deg, hsl(164 72% 92%) 60%, transparent 100%)",
             }}
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ChevronUp className="h-5 w-5 text-primary-foreground/40" />
-            <p className="text-xs font-semibold text-primary-foreground/40 mt-1">Swipe up for new challenges</p>
+            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground mt-1">Swipe up for new challenges</p>
           </motion.div>
         </motion.div>
       )}
