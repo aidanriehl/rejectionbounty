@@ -41,7 +41,7 @@ function ReelCard({ post }: { post: FeedPost }) {
 
   return (
     <div
-      className="relative h-screen w-full snap-start snap-always flex-shrink-0"
+      className="relative h-[calc(100dvh-4.5rem)] w-full snap-start snap-always flex-shrink-0"
       onClick={handleDoubleTap}
     >
       <img
@@ -144,7 +144,7 @@ export default function Feed() {
   );
 
   return (
-    <div data-tour="feed" className="relative h-screen w-full overflow-hidden bg-black">
+    <div data-tour="feed" className="relative h-[calc(100dvh-4.5rem)] w-full overflow-hidden bg-black">
       {/* Tab bar overlay */}
       <div className="absolute top-0 inset-x-0 z-10 pt-9 px-4">
         <div className="flex items-center justify-center gap-6">
