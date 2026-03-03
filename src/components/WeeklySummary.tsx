@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
-import { Trophy, ChevronUp, Play } from "lucide-react";
+import { Trophy, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import type { AvatarType, AvatarStage } from "@/lib/mock-data";
@@ -86,45 +86,40 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
         >
           {/* Header */}
           <div className="px-4 pt-12 pb-4 text-center">
-            <motion.p
-              className="text-xs font-semibold tracking-widest uppercase text-muted-foreground"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              Last Week's Recap
-            </motion.p>
             <motion.h1
-              className="mt-2 text-3xl font-extrabold text-foreground"
+              className="text-3xl font-extrabold text-foreground"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, type: "spring" }}
             >
-              Weekly Summary
+              Last Week's Recap
             </motion.h1>
 
             {/* Qualified banner */}
             {youQualified && (
               <motion.div
                 className="mx-auto mt-4 flex items-center gap-2 rounded-full px-4 py-2 w-fit"
-                style={{ backgroundColor: 'hsl(164 72% 88%)' }}
+                style={{ backgroundColor: 'hsl(43 96% 80%)' }}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, type: "spring" }}
               >
-                <Trophy className="h-4 w-4 text-primary" />
-                <span className="text-sm font-bold text-primary">You qualified for the prize pool!</span>
+                <Trophy className="h-4 w-4" style={{ color: 'hsl(43 80% 35%)' }} />
+                <span className="text-sm font-bold" style={{ color: 'hsl(43 80% 25%)' }}>You qualified for the prize pool!</span>
               </motion.div>
             )}
+          </div>
 
-            <motion.p
-              className="mt-3 text-sm text-muted-foreground"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+          {/* Qualification stat */}
+          <div className="px-4">
+            <motion.div
+              className="rounded-2xl border border-border bg-card shadow-sm px-4 py-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
             >
-              {qualifiedPercent}% of users completed 5+ challenges
-            </motion.p>
+              <p className="text-sm font-semibold text-foreground">{qualifiedPercent}% of users completed 5+ challenges</p>
+            </motion.div>
           </div>
 
           {/* Challenge Take Rates */}
@@ -136,7 +131,7 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
               transition={{ delay: 0.4 }}
             >
               <div className="px-4 py-3 border-b border-border">
-                <h2 className="text-sm font-bold text-foreground">Challenge Take Rates</h2>
+                <h2 className="text-sm font-bold text-foreground">Group Take Rates</h2>
               </div>
               {mockChallengeResults.map((challenge, i) => (
                 <motion.div
@@ -179,16 +174,19 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
           {/* Top Videos Gallery */}
           <div className="px-4 mt-4 mb-6">
             <motion.div
+              className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              <h2 className="text-sm font-bold text-foreground mb-3 px-1">🔥 Top Videos This Week</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="px-4 py-3 border-b border-border">
+                <h2 className="text-sm font-bold text-foreground">🔥 Top Videos This Week</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-3 p-3">
                 {mockTopVideos.map((video, i) => (
                   <motion.button
                     key={video.username}
-                    className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden text-left"
+                    className="rounded-xl border border-border/50 overflow-hidden text-left bg-muted/30"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.9 + i * 0.1, type: "spring" }}
@@ -219,18 +217,19 @@ export default function WeeklySummary({ onContinue }: WeeklySummaryProps) {
             </motion.div>
           </div>
 
-          {/* Swipe indicator */}
-          <motion.div
-            className="sticky bottom-0 pb-8 pt-4 flex flex-col items-center"
+          {/* Continue button */}
+          <div className="sticky bottom-0 pb-8 pt-4 flex flex-col items-center"
             style={{
               background: "linear-gradient(0deg, hsl(164 72% 92%) 60%, transparent 100%)",
             }}
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            <p className="text-xs font-semibold text-muted-foreground mt-1">Swipe up for new challenges</p>
-          </motion.div>
+            <button
+              onClick={() => { setDismissed(true); setTimeout(onContinue, 400); }}
+              className="rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-md active:scale-95 transition-transform"
+            >
+              See This Week's Challenges
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
